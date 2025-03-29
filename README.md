@@ -5,21 +5,24 @@ RhinoMCP connects Rhino, Grasshopper and more to Claude AI through the Model Con
 ## Features
 
 #### Rhino
+
 - **Two-way communication**: Connect Claude AI to Rhino through a socket-based server
 - **Object manipulation and management**: Create and modify 3D objects in Rhino including metadata
 - **Layer management**: View and interact with Rhino layers
-- **Scene inspection**: Get detailed information about the current Rhino scene (incl. screencapture) 
+- **Scene inspection**: Get detailed information about the current Rhino scene (incl. screencapture)
 - **Code execution**: Run arbitrary Python code in Rhino from Claude
- 
+
 #### Grasshopper
+
 - **Code execution**: Run arbitrary Python code in Grasshopper from Claude - includes the generation of gh components
 - **Gh canvas inspection**: give the LLM an Idea of your grasshopper code - or ask it about your code.
-- **non-blocking two-way communication**: .. via a ghpython script 
+- **non-blocking two-way communication**: .. via a ghpython script
 
-note: this is not very stable right now 
+note: this is not very stable right now
 
 ##### Replicate
-- **AI Models**: replicate offers thousands of AI models via API, implemented here: a stable diffusion variant 
+
+- **AI Models**: replicate offers thousands of AI models via API, implemented here: a stable diffusion variant
 
 ## Components
 
@@ -39,12 +42,14 @@ The system consists of two main components:
 ### Setting up the Python Environment
 
 1. Create a new conda environment with Python 3.10:
+
    ```bash
    conda create -n rhino_mcp python=3.10
    conda activate rhino_mcp
    ```
 
 2. Install the `uv` package manager:
+
    ```bash
    pip install uv
    ```
@@ -78,6 +83,7 @@ The MCP server will be started automatically by Claude Desktop using the configu
 ### Starting the Connection
 
 1. First, start the Rhino script:
+
    - Open Rhino 7
    - Open the Python Editor
    - Open and run `rhino_script.py`
@@ -97,36 +103,26 @@ The MCP server will be started automatically by Claude Desktop using the configu
 
 To integrate with Claude Desktop:
 
-1. Go to Claude Desktop > Settings > Developer > Edit Config 
+1. Go to Claude Desktop > Settings > Developer > Edit Config
 2. Open the `claude_desktop_config.json` file and add the following configuration:
 
 ```json
 {
-    "mcpServers": {
-        "rhino": {
-            "command": "/Users/Joo/miniconda3/envs/rhino_mcp/bin/python",
-            "args": [
-                "-m", "rhino_mcp.server"
-            ]
-        }
+  "mcpServers": {
+    "rhino": {
+      "command": "/Users/Joo/miniconda3/envs/rhino_mcp/bin/python",
+      "args": ["-m", "rhino_mcp.server"]
     }
+  }
 }
 ```
 
 Make sure to:
+
 - Replace the Python path with the path to Python in your conda environment
 - Save the file and restart Claude Desktop
 
 > **Important Note:** If you're using a conda environment, you must specify the full path to the Python interpreter as shown above. Using the `uvx` command might not work properly with conda environments.
-
-### Setting up Replicate Integration
-
-1. Create a `.env` file in the root directory of the project
-2. Add your Replicate API token:
-   ```
-   REPLICATE_API_TOKEN=your_token_here
-   ```
-3. Make sure to keep this file private and never commit it to version control
 
 ### Grasshopper Integration(wip)
 
@@ -142,7 +138,6 @@ Once connected, Calude or another LLM can use the following MCP tools:
 - `get_objects_with_metadata(filters, metadata_fields)`: Get detailed information about objects in the scene with their metadata, with optional filtering
 - `capture_viewport(layer, show_annotations, max_size)`: Capture the viewport with optional annotations and layer filtering
 
-
 ### Example Commands
 
 Here are some examples of what you can ask Claude to do:
@@ -155,7 +150,7 @@ Here are some examples of what you can ask Claude to do:
 ### WebSocket MCP Server(WIP)
 
 1. This feature is for developing websockect connection with remote web mcp client server.
-2. MCP websockect Server (`rhino_mcp/web_server.py`)**: A Python server that implements the Model Context Protocol and connects to the Rhino script with websockect connection
+2. MCP websockect Server (`rhino_mcp/web_server.py`)\*\*: A Python server that implements the Model Context Protocol and connects to the Rhino script with websockect connection
    ```bash
    python web_server.py
    ```
@@ -166,4 +161,3 @@ To add new functionality, you need to:
 
 1. Add new command handlers and functions in `rhino_script.py` and the `RhinoMCPServer` class.
 2. Add corresponding MCP tools in `server.py` that include tool and arg descriptions
-
