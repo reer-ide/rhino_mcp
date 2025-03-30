@@ -33,37 +33,51 @@ def rhino_creation_strategy() -> str:
     """Defines the preferred strategy for creating and managing objects in Rhino"""
     return """When working with Rhino through MCP, follow these guidelines:
 
+    Especially when working with geometry, iterate with smaller steps and check the scene state from time to time.
+    Act strategically with a long-term plan, think about how to organize the data and scene objects in a way that is easy to maintain and extend, by using layers and metadata (name, description),
+    with the get_objects_with_metadata() function you can filter and select objects based on this metadata. You can access objects, and with the "type" attribute you can check their geometry type and
+    access the geometry specific properties (such as corner points etc.) to create more complex scenes with spatial consistency. Start from sparse to detail (e.g. first the building plot, then the wall, then the window etc. - it is crucial to use metadata to be able to do that)
+
     1. Scene Context Awareness:
        - Always start by checking the scene using get_scene_info() for basic overview
-       - Use the capture_viewport to get an image from viewport
-       - Use get_objects_with_metadata() for detailed object information
+       - Use the capture_viewport to get an image from viewport to get a quick overview of the scene
+       - Use get_objects_with_metadata() for detailed object information and filtering
+       - The short_id in metadata can be displayed in viewport using capture_viewport()
 
     2. Object Creation and Management:
-       - When creating objects, ALWAYS call add_object_metadata() after creation
-       - Use meaningful names for objects
-       - Organize scenes with layers
-       - Think about grouping objects
+       - When creating objects, ALWAYS call add_object_metadata() after creation (The add_object_metadata() function is provided in the code context)   
+       - Use meaningful names for objects to help with you with later identification, organize the scenes with layers (but not too many layers)
+       - Think about grouping objects (e.g. two planes that form a window)
     
-    3. Always check the bbox for spatial relationships
+    3. Always check the bbox for each item so that (it's stored as list of points in the metadata under the key "bbox"):
+            - Ensure that all objects that should not be clipping are not clipping.
+            - Items have the right spatial relationship.
 
     4. Code Execution:
-       - This is Rhino 7 with IronPython 2.7 - no f-strings!
-       - Prefer automated solutions over user interaction
+       - This is Rhino 7 with IronPython 2.7 - no f-strings or modern Python features etc
+       - DONT FORGET NO f-strings! No f-strings, No f-strings!
+       - Prefer automated solutions over user interaction, unless its requested or it makes sense or you struggle with errors
+       - You can use rhino command syntax to ask the user questions e.g. "should i do "A" or "B"" where A,B are clickable options
+
+    5. Best Practices:
+       - Keep objects organized in appropriate layers
+       - Use meaningful names and descriptions
+       - Use viewport captures to verify visual results
     """
 
-@mcp.prompt()
-def grasshopper_usage_strategy() -> str:
-    """Defines the preferred strategy for working with Grasshopper through MCP"""
-    return """When working with Grasshopper through MCP, follow these guidelines:
-    1. Connection Setup:
-       - Always check if the Grasshopper server is available
-    2. Definition Exploration:
-       - Use get_definition_info() for overview
-    3. Code Execution:
-       - Use IronPython 2.7 compatible code
-       - Can create grasshopper components via code
-       - Can access rhino objects by reference
-    """
+# @mcp.prompt()
+# def grasshopper_usage_strategy() -> str:
+#     """Defines the preferred strategy for working with Grasshopper through MCP"""
+#     return """When working with Grasshopper through MCP, follow these guidelines:
+#     1. Connection Setup:
+#        - Always check if the Grasshopper server is available
+#     2. Definition Exploration:
+#        - Use get_definition_info() for overview
+#     3. Code Execution:
+#        - Use IronPython 2.7 compatible code
+#        - Can create grasshopper components via code
+#        - Can access rhino objects by reference
+#     """
 
 # HTTP endpoint
 @app.post("/rhino/command")

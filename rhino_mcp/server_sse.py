@@ -5,6 +5,17 @@ from dataclasses import dataclass
 from contextlib import asynccontextmanager
 from typing import AsyncIterator, Dict, Any, List, Optional
 from pathlib import Path
+from rhino_mcp.rhino_tools import RhinoTools, get_rhino_connection
+from rhino_mcp.grasshopper_tools import GrasshopperTools, get_grasshopper_connection
+from typing import Any
+import httpx
+from mcp.server.fastmcp import FastMCP
+from starlette.applications import Starlette
+from mcp.server.sse import SseServerTransport
+from starlette.requests import Request
+from starlette.routing import Mount, Route
+from mcp.server import Server
+import uvicorn
 
 # Try to load environment variables from .env file
 try:
@@ -16,9 +27,7 @@ try:
 except ImportError:
     logging.warning("python-dotenv not installed. Install it to use .env files: pip install python-dotenv")
 
-# Import our tool modules
-from rhino_mcp.rhino_tools import RhinoTools, get_rhino_connection
-from rhino_mcp.grasshopper_tools import GrasshopperTools, get_grasshopper_connection
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, 
@@ -140,9 +149,43 @@ def grasshopper_usage_strategy() -> str:
 
     """
 
+def create_starlette_app(mcp_server: Server, *, debug: bool = False) -> Starlette:
+    """Create a Starlette application that can serve the provided mcp server with SSE."""
+    sse = SseServerTransport("/messages/")
+
+    async def handle_sse(request: Request) -> None:
+        async with sse.connect_sse(
+                request.scope,
+                request.receive,
+                request._send,
+        ) as (read_stream, write_stream):
+            await mcp_server.run(
+                read_stream,
+                write_stream,
+                mcp_server.create_initialization_options(),
+            )
+
+    return Starlette(
+        debug=debug,
+        routes=[
+            Route("/sse", endpoint=handle_sse),
+            Mount("/messages/", app=sse.handle_post_message),
+        ],
+    )
+
+# Replace the main function
 def main():
-    """Run the MCP server"""
-    app.run(transport='stdio')
+    """Run the MCP server with SSE transport"""
+    mcp_server = app._mcp_server
+
+    # Define default settings
+    HOST = "127.0.0.1"  # 或 "localhost"，只允许本机访问
+    PORT = 8080      
+
+    # Create and run the Starlette app
+    starlette_app = create_starlette_app(mcp_server, debug=True)
+    logger.info(f"Starting RhinoMCP server on {HOST}:{PORT}")
+    uvicorn.run(starlette_app, host=HOST, port=PORT)
 
 if __name__ == "__main__":
     main()
