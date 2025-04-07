@@ -158,8 +158,6 @@ Here are some examples of what you can ask Claude to do:
 - "Get all layers in the Rhino document"
 - "Execute this Python code in Rhino: ..."
 
-   ```
-
 ## Extending
 
 To add new functionality, you need to:
