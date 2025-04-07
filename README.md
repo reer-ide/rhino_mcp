@@ -138,6 +138,17 @@ Once connected, Calude or another LLM can use the following MCP tools:
 - `get_objects_with_metadata(filters, metadata_fields)`: Get detailed information about objects in the scene with their metadata, with optional filtering
 - `capture_viewport(layer, show_annotations, max_size)`: Capture the viewport with optional annotations and layer filtering
 
+### MCP Inspector
+
+1. Runing following command in cmd
+
+- `npx @modelcontextprotocol/inspector`
+
+2. Select Transport Type such as SSE or Stdio
+3. For SSE mcp server, you should start the server manually then connect the port accordingly in the mcp inspector -
+   - Sample URL of SSE Server http://localhost:8080/sse
+   - Sample URL of Stdio Server http://localhost:8080
+
 ### Example Commands
 
 Here are some examples of what you can ask Claude to do:
@@ -147,12 +158,6 @@ Here are some examples of what you can ask Claude to do:
 - "Get all layers in the Rhino document"
 - "Execute this Python code in Rhino: ..."
 
-### WebSocket MCP Server(WIP)
-
-1. This feature is for developing websockect connection with remote web mcp client server.
-2. MCP websockect Server (`rhino_mcp/web_server.py`)\*\*: A Python server that implements the Model Context Protocol and connects to the Rhino script with websockect connection
-   ```bash
-   python web_server.py
    ```
 
 ## Extending
@@ -161,3 +166,15 @@ To add new functionality, you need to:
 
 1. Add new command handlers and functions in `rhino_script.py` and the `RhinoMCPServer` class.
 2. Add corresponding MCP tools in `server.py` that include tool and arg descriptions
+
+## Relevant Documentation and Resources
+- MCP offical Documentation :
+   - Client Developer: https://modelcontextprotocol.io/quickstart/client
+   - Server Developer: https://modelcontextprotocol.io/quickstart/server
+- Open Source MCP Documentation: https://github.com/cyanheads/model-context-protocol-resources
+   - Client Developer: https://github.com/cyanheads/model-context-protocol-resources/blob/main/guides/mcp-client-development-guide.md
+   - Server Developer: https://github.com/cyanheads/model-context-protocol-resources/blob/main/guides/mcp-server-development-guide.md
+- Open web UI for building AI agent interface:https://github.com/open-webui/open-webui
+
+
+

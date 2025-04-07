@@ -119,6 +119,7 @@ def rhino_creation_strategy() -> str:
 
     4. Code Execution:
        - This is Rhino 7 with IronPython 2.7 - no f-strings or modern Python features etc
+       - Please use the Irhono python 2.7 library to access rhino functions
        - DONT FORGET NO f-strings! No f-strings, No f-strings!
        - Prefer automated solutions over user interaction, unless its requested or it makes sense or you struggle with errors
        - You can use rhino command syntax to ask the user questions e.g. "should i do "A" or "B"" where A,B are clickable options
