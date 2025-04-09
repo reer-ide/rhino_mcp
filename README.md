@@ -56,7 +56,6 @@ The system consists of two main components:
 
 3. Install the package in development mode:
    ```bash
-   cd rhino_mcp  # Navigate to the package directory
    uv pip install -e .
    ```
 
@@ -166,13 +165,11 @@ To add new functionality, you need to:
 2. Add corresponding MCP tools in `server.py` that include tool and arg descriptions
 
 ## Relevant Documentation and Resources
+
 - MCP offical Documentation :
-   - Client Developer: https://modelcontextprotocol.io/quickstart/client
-   - Server Developer: https://modelcontextprotocol.io/quickstart/server
+  - Client Developer: https://modelcontextprotocol.io/quickstart/client
+  - Server Developer: https://modelcontextprotocol.io/quickstart/server
 - Open Source MCP Documentation: https://github.com/cyanheads/model-context-protocol-resources
-   - Client Developer: https://github.com/cyanheads/model-context-protocol-resources/blob/main/guides/mcp-client-development-guide.md
-   - Server Developer: https://github.com/cyanheads/model-context-protocol-resources/blob/main/guides/mcp-server-development-guide.md
+  - Client Developer: https://github.com/cyanheads/model-context-protocol-resources/blob/main/guides/mcp-client-development-guide.md
+  - Server Developer: https://github.com/cyanheads/model-context-protocol-resources/blob/main/guides/mcp-server-development-guide.md
 - Open web UI for building AI agent interface:https://github.com/open-webui/open-webui
-
-
-
