@@ -270,8 +270,8 @@ class RhinoTools:
         Example of proper object creation:
         <<<python
         # Create geometry
-        cube_id = rs.AddBox(rs.WorldXYPlane(), 5, 5, 5)
-            # Add metadata - ALWAYS do this after creating an object
+        cube_id = rs.AddBox(corners)
+        # Add metadata - ALWAYS do this after creating an object
         add_object_metadata(cube_id, "My Cube", "A test cube created via MCP")
 
         >>>
@@ -280,59 +280,59 @@ class RhinoTools:
         """
         try:
             code_template = """
-import rhinoscriptsyntax as rs
-import scriptcontext as sc
-import json
-import time
-from datetime import datetime
+                import rhinoscriptsyntax as rs
+                import scriptcontext as sc
+                import json
+                import time
+                from datetime import datetime
 
-def add_object_metadata(obj_id, name=None, description=None):
-    \"\"\"Add standardized metadata to an object\"\"\"
-    try:
-        # Generate short ID
-        short_id = datetime.now().strftime("%d%H%M%S")
-        
-        # Get bounding box
-        bbox = rs.BoundingBox(obj_id)
-        bbox_data = [[p.X, p.Y, p.Z] for p in bbox] if bbox else []
-        
-        # Get object type
-        obj = sc.doc.Objects.Find(obj_id)
-        obj_type = obj.Geometry.GetType().Name if obj else "Unknown"
-        
-        # Standard metadata
-        metadata = {
-            "short_id": short_id,
-            "created_at": time.time(),
-            "layer": rs.ObjectLayer(obj_id),
-            "type": obj_type,
-            "bbox": bbox_data
-        }
-        
-        # User-provided metadata
-        if name:
-            rs.ObjectName(obj_id, name)
-            metadata["name"] = name
-        else:
-            auto_name = "{0}_{1}".format(obj_type, short_id)
-            rs.ObjectName(obj_id, auto_name)
-            metadata["name"] = auto_name
-            
-        if description:
-            metadata["description"] = description
-            
-        # Store metadata as user text
-        user_text_data = metadata.copy()
-        user_text_data["bbox"] = json.dumps(bbox_data)
-        
-        for key, value in user_text_data.items():
-            rs.SetUserText(obj_id, key, str(value))
-            
-        return {"status": "success"}
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
+                def add_object_metadata(obj_id, name=None, description=None):
+                    # Add standardized metadata to an object
+                    try:
+                        # Generate short ID
+                        short_id = datetime.now().strftime("%d%H%M%S")
+                        
+                        # Get bounding box
+                        bbox = rs.BoundingBox(obj_id)
+                        bbox_data = [[p.X, p.Y, p.Z] for p in bbox] if bbox else []
+                        
+                        # Get object type
+                        obj = sc.doc.Objects.Find(obj_id)
+                        obj_type = obj.Geometry.GetType().Name if obj else "Unknown"
+                        
+                        # Standard metadata
+                        metadata = {
+                            "short_id": short_id,
+                            "created_at": time.time(),
+                            "layer": rs.ObjectLayer(obj_id),
+                            "type": obj_type,
+                            "bbox": bbox_data
+                        }
+                        
+                        # User-provided metadata
+                        if name:
+                            rs.ObjectName(obj_id, name)
+                            metadata["name"] = name
+                        else:
+                            auto_name = "{0}_{1}".format(obj_type, short_id)
+                            rs.ObjectName(obj_id, auto_name)
+                            metadata["name"] = auto_name
+                            
+                        if description:
+                            metadata["description"] = description
+                            
+                        # Store metadata as user text
+                        user_text_data = metadata.copy()
+                        user_text_data["bbox"] = json.dumps(bbox_data)
+                        
+                        for key, value in user_text_data.items():
+                            rs.SetUserText(obj_id, key, str(value))
+                            
+                        return {"status": "success"}
+                    except Exception as e:
+                        return {"status": "error", "message": str(e)}
 
-""" + code
+            """ + code
             logger.info("Sending code execution request to Rhino")
             connection = get_rhino_connection()
             result = connection.send_command("execute_code", {"code": code_template})

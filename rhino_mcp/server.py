@@ -105,8 +105,8 @@ def rhino_creation_strategy() -> str:
        - Think about grouping objects (e.g. two planes that form a window)
     
     3. Always check the bbox for each item so that (it's stored as list of points in the metadata under the key "bbox"):
-            - Ensure that all objects that should not be clipping are not clipping.
-            - Items have the right spatial relationship.
+        - Ensure that all objects that should not be clipping are not clipping.
+        - Items have the right spatial relationship.
 
     4. Code Execution:
        - This is Rhino 7 with IronPython 2.7 - no f-strings or modern Python features etc
@@ -119,6 +119,7 @@ def rhino_creation_strategy() -> str:
        - Keep objects organized in appropriate layers
        - Use meaningful names and descriptions
        - Use viewport captures to verify visual results
+       - When encouonter errors related to RhinoScriptSyntax, make sure to search the web for the correct syntax from the RhinoScriptSyntax API documentation
     """
 
 @app.prompt()
