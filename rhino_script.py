@@ -397,6 +397,19 @@ class RhinoMCPServer:
             # Create a new scope for code execution
             local_dict = {}
             
+            # Create a list to store printed output
+            printed_output = []
+            
+            # Override print function to capture output
+            def custom_print(*args, **kwargs):
+                output = " ".join(str(arg) for arg in args)
+                printed_output.append(output)
+                # Also print to Rhino's command line
+                Rhino.RhinoApp.WriteLine(output)
+            
+            # Add custom print to local scope
+            local_dict['print'] = custom_print
+            
             try:
                 # Execute the code
                 exec(code, globals(), local_dict)
@@ -408,26 +421,28 @@ class RhinoMCPServer:
                 response = {
                     "status": "success",
                     "result": str(result),
-                    "variables": {k: str(v) for k, v in local_dict.items() if not k.startswith('__')}
+                    "printed_output": printed_output,  # Include captured print output
+                    #"variables": {k: str(v)  k, v in local_dict.items() if not k.startswith('__')}
                 }
                 
                 log_message("Sending response: {0}".format(json.dumps(response)))
                 return response
                 
             except Exception as e:
-                hint = "Did you use f-string formatting? You have to use IronPython here that doesn't support this."
+                # hint = "Did you use f-string formatting? You have to use IronPython here that doesn't support this."
                 error_response = {
                     "status": "error",
-                    "message": "{0} {1}".format(hint, str(e)),
+                    "message": str(e),
+                    "printed_output": printed_output  # Include any output captured before the error
                 }
                 log_message("Error: {0}".format(error_response))
                 return error_response
                 
         except Exception as e:
-            hint = "Did you use f-string formatting? You have to use IronPython here that doesn't support this."
+            # hint = "Did you use f-string formatting? You have to use IronPython here that doesn't support this."
             error_response = {
                 "status": "error",
-                "message": "{0} {1}".format(hint, str(e)),
+                "message": str(e),
             }
             log_message("System error: {0}".format(error_response))
             return error_response

@@ -253,6 +253,7 @@ class RhinoTools:
         3. When creating objects, ALWAYS call add_object_metadata(name, description) after creation
         4. For user interaction, you can use RhinoCommon syntax (selected_objects = rs.GetObjects("Please select some objects") etc.) prompted the suer what to do 
            but prefer automated solutions unless user interaction is specifically requested
+        5. Always show the user the code you are executing   
         
         The add_object_metadata() function is provided in the code context and must be called
         after creating any object. It adds standardized metadata including:
@@ -280,57 +281,57 @@ class RhinoTools:
         """
         try:
             code_template = """
-                import rhinoscriptsyntax as rs
-                import scriptcontext as sc
-                import json
-                import time
-                from datetime import datetime
+import rhinoscriptsyntax as rs
+import scriptcontext as sc
+import json
+import time
+from datetime import datetime
 
-                def add_object_metadata(obj_id, name=None, description=None):
-                    # Add standardized metadata to an object
-                    try:
-                        # Generate short ID
-                        short_id = datetime.now().strftime("%d%H%M%S")
-                        
-                        # Get bounding box
-                        bbox = rs.BoundingBox(obj_id)
-                        bbox_data = [[p.X, p.Y, p.Z] for p in bbox] if bbox else []
-                        
-                        # Get object type
-                        obj = sc.doc.Objects.Find(obj_id)
-                        obj_type = obj.Geometry.GetType().Name if obj else "Unknown"
-                        
-                        # Standard metadata
-                        metadata = {
-                            "short_id": short_id,
-                            "created_at": time.time(),
-                            "layer": rs.ObjectLayer(obj_id),
-                            "type": obj_type,
-                            "bbox": bbox_data
-                        }
-                        
-                        # User-provided metadata
-                        if name:
-                            rs.ObjectName(obj_id, name)
-                            metadata["name"] = name
-                        else:
-                            auto_name = "{0}_{1}".format(obj_type, short_id)
-                            rs.ObjectName(obj_id, auto_name)
-                            metadata["name"] = auto_name
-                            
-                        if description:
-                            metadata["description"] = description
-                            
-                        # Store metadata as user text
-                        user_text_data = metadata.copy()
-                        user_text_data["bbox"] = json.dumps(bbox_data)
-                        
-                        for key, value in user_text_data.items():
-                            rs.SetUserText(obj_id, key, str(value))
-                            
-                        return {"status": "success"}
-                    except Exception as e:
-                        return {"status": "error", "message": str(e)}
+def add_object_metadata(obj_id, name=None, description=None):
+    # Add standardized metadata to an object
+    try:
+        # Generate short ID
+        short_id = datetime.now().strftime("%d%H%M%S")
+        
+        # Get bounding box
+        bbox = rs.BoundingBox(obj_id)
+        bbox_data = [[p.X, p.Y, p.Z] for p in bbox] if bbox else []
+        
+        # Get object type
+        obj = sc.doc.Objects.Find(obj_id)
+        obj_type = obj.Geometry.GetType().Name if obj else "Unknown"
+        
+        # Standard metadata
+        metadata = {
+            "short_id": short_id,
+            "created_at": time.time(),
+            "layer": rs.ObjectLayer(obj_id),
+            "type": obj_type,
+            "bbox": bbox_data
+        }
+        
+        # User-provided metadata
+        if name:
+            rs.ObjectName(obj_id, name)
+            metadata["name"] = name
+        else:
+            auto_name = "{0}_{1}".format(obj_type, short_id)
+            rs.ObjectName(obj_id, auto_name)
+            metadata["name"] = auto_name
+            
+        if description:
+            metadata["description"] = description
+            
+        # Store metadata as user text
+        user_text_data = metadata.copy()
+        user_text_data["bbox"] = json.dumps(bbox_data)
+        
+        for key, value in user_text_data.items():
+            rs.SetUserText(obj_id, key, str(value))
+            
+        return {"status": "success"}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
 
             """ + code
             logger.info("Sending code execution request to Rhino")
@@ -339,13 +340,19 @@ class RhinoTools:
             
             logger.info("Received response from Rhino: {0}".format(result))
             
-            # Simplified error handling
+            # Handle the response including printed output
             if result.get("status") == "error":
                 error_msg = "Error: {0}".format(result.get("message", "Unknown error"))
+                printed_output = result.get("printed_output", [])
+                if printed_output:
+                    error_msg += "\n\nPrinted output before error:\n" + "\n".join(printed_output)
                 logger.error("Code execution error: {0}".format(error_msg))
                 return error_msg
             else:
                 response = result.get("result", "Code executed successfully")
+                printed_output = result.get("printed_output", [])
+                if printed_output:
+                    response += "\n\nPrinted output:\n" + "\n".join(printed_output)
                 logger.info("Code execution successful: {0}".format(response))
                 return response
                 

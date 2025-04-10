@@ -188,7 +188,7 @@ class GrasshopperTools:
                     code = "\n".join(lines)
                 else:
                     # Append a default result if no return or result is present
-                    code += "\n\n# Auto-added result assignment\nresult = \"Code executed successfully\""
+                    code += "\n\n# Auto-added result assignment\nresult = 'Code executed successfully'"
             
             logger.info("Sending code execution request to Grasshopper with description: {0}".format(description))
             connection = get_grasshopper_connection()

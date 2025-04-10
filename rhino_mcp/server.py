@@ -110,12 +110,18 @@ def rhino_creation_strategy() -> str:
 
     4. Code Execution:
        - This is Rhino 7 with IronPython 2.7 - no f-strings or modern Python features etc
+       - rhinoscriptsyntax is already imported as rs
+       - scriptcontext is already imported as sc
+       - json is already imported as json
+       - time is already imported as time
+       - datetime is already imported as datetime
        - Please use the Irhono python 2.7 library to access rhino functions
        - DONT FORGET NO f-strings! No f-strings, No f-strings!
        - Prefer automated solutions over user interaction, unless its requested or it makes sense or you struggle with errors
        - You can use rhino command syntax to ask the user questions e.g. "should i do "A" or "B"" where A,B are clickable options
 
     5. Best Practices:
+       - Always show the user the code you are executing, for example show the input to the execute_rhino_code() function in { `code`: `...`}   
        - Keep objects organized in appropriate layers
        - Use meaningful names and descriptions
        - Use viewport captures to verify visual results
