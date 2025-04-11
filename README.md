@@ -173,3 +173,4 @@ To add new functionality, you need to:
   - Client Developer: https://github.com/cyanheads/model-context-protocol-resources/blob/main/guides/mcp-client-development-guide.md
   - Server Developer: https://github.com/cyanheads/model-context-protocol-resources/blob/main/guides/mcp-server-development-guide.md
 - Open web UI for building AI agent interface:https://github.com/open-webui/open-webui
+- Switch between Stdio Server and SSE server:https://github.com/supercorp-ai/supergateway
