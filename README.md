@@ -1,6 +1,6 @@
 # RhinoMCP - Rhino Model Context Protocol Integration
 
-RhinoMCP connects Rhino, Grasshopper and more to Claude AI through the Model Context Protocol (MCP), allowing Claude to directly interact with and control Rhino + Grasshopper. If you provide a replicate.com api key you can also AI render images. This integration enables prompt-assisted 3D modeling, scene creation, and manipulation. (inspired by [blender_mcp](https://github.com/ahujasid/blender-mcp))
+RhinoMCP connects Rhino, Grasshopper and more to Claude AI through the Model Context Protocol (MCP), allowing Claude to directly interact with and control Rhino. This integration enables prompt-assisted 3D modeling, scene creation, and manipulation. (inspired by [blender_mcp](https://github.com/ahujasid/blender-mcp))
 
 ## Features
 
@@ -19,10 +19,6 @@ RhinoMCP connects Rhino, Grasshopper and more to Claude AI through the Model Con
 - **non-blocking two-way communication**: .. via a ghpython script
 
 note: this is not very stable right now
-
-##### Replicate
-
-- **AI Models**: replicate offers thousands of AI models via API, implemented here: a stable diffusion variant
 
 ## Components
 
