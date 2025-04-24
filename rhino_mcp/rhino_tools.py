@@ -166,13 +166,13 @@ class RhinoTools:
         
         This is a CORE FUNCTION for scene context awareness. It provides:
         1. Full metadata for each object we created via this mcp connection including:
-           - short_id (DDHHMMSS format), can be dispalyed in the viewport when using capture_viewport, can help yo uto visually identify the a object and find it with this function
+           - short_id (DDHHMMSS format), can be dispalyed in the viewport when using capture_viewport, can help visually identify the a object and find it with this function
            - created_at timestamp
            - layer  - layer path
            - type - geometry type 
            - bbox - the bounding box as lsit of points
            - name - the name you assigned 
-           - description - description yo uasigned 
+           - description - description you assigned 
         
         2. Advanced filtering capabilities:
            - layer: Filter by layer name (supports wildcards, e.g., "Layer*")
