@@ -1,6 +1,6 @@
 # RhinoMCP - Rhino Model Context Protocol Integration
 
-RhinoMCP connects Rhino, Grasshopper and more to Claude AI through the Model Context Protocol (MCP), allowing Claude to directly interact with and control Rhino + Grasshopper. If you provide a replicate.com api key you can also AI render images. This integration enables prompt-assisted 3D modeling, scene creation, and manipulation. (inspired by [blender_mcp](https://github.com/ahujasid/blender-mcp))
+RhinoMCP connects Rhino, Grasshopper and more to Claude AI through the Model Context Protocol (MCP), allowing Claude to directly interact with and control Rhino. This integration enables prompt-assisted 3D modeling, scene creation, and manipulation. (inspired by [blender_mcp](https://github.com/ahujasid/blender-mcp))
 
 ## Features
 
@@ -11,18 +11,6 @@ RhinoMCP connects Rhino, Grasshopper and more to Claude AI through the Model Con
 - **Layer management**: View and interact with Rhino layers
 - **Scene inspection**: Get detailed information about the current Rhino scene (incl. screencapture)
 - **Code execution**: Run arbitrary Python code in Rhino from Claude
-
-#### Grasshopper
-
-- **Code execution**: Run arbitrary Python code in Grasshopper from Claude - includes the generation of gh components
-- **Gh canvas inspection**: give the LLM an Idea of your grasshopper code - or ask it about your code.
-- **non-blocking two-way communication**: .. via a ghpython script
-
-note: this is not very stable right now
-
-##### Replicate
-
-- **AI Models**: replicate offers thousands of AI models via API, implemented here: a stable diffusion variant
 
 ## Components
 
@@ -173,3 +161,4 @@ To add new functionality, you need to:
   - Client Developer: https://github.com/cyanheads/model-context-protocol-resources/blob/main/guides/mcp-client-development-guide.md
   - Server Developer: https://github.com/cyanheads/model-context-protocol-resources/blob/main/guides/mcp-server-development-guide.md
 - Open web UI for building AI agent interface:https://github.com/open-webui/open-webui
+- Switch between Stdio Server and SSE server:https://github.com/supercorp-ai/supergateway
