@@ -12,14 +12,6 @@ RhinoMCP connects Rhino, Grasshopper and more to Claude AI through the Model Con
 - **Scene inspection**: Get detailed information about the current Rhino scene (incl. screencapture)
 - **Code execution**: Run arbitrary Python code in Rhino from Claude
 
-#### Grasshopper
-
-- **Code execution**: Run arbitrary Python code in Grasshopper from Claude - includes the generation of gh components
-- **Gh canvas inspection**: give the LLM an Idea of your grasshopper code - or ask it about your code.
-- **non-blocking two-way communication**: .. via a ghpython script
-
-note: this is not very stable right now
-
 ## Components
 
 The system consists of two main components:
