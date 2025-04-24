@@ -5,7 +5,7 @@ description = "Rhino integration through the Model Context Protocol"
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [
-    {name = "Rhino MCP Team"}
+    {name = "REER Rhino MCP Team"}
 ]
 license = {text = "MIT"}
 classifiers = [
