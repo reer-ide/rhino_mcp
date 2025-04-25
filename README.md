@@ -123,7 +123,7 @@ To integrate with Claude Desktop:
 {
   "mcpServers": {
     "rhino": {
-      "command": "/your/python/path",
+      "command": "/your/python/path", //C:\Users\rtx3090\anaconda3\envs\rhino_mcp
       "args": ["-m", "rhino_mcp.server"]
     }
   }
