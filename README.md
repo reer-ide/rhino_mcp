@@ -123,12 +123,15 @@ To integrate with Claude Desktop:
 {
   "mcpServers": {
     "rhino": {
-      "command": "/your/python/path", //C:\Users\rtx3090\anaconda3\envs\rhino_mcp
+      "command": "/your/python/path",
       "args": ["-m", "rhino_mcp.server"]
     }
   }
 }
 ```
+Example paths:
+- Windows: `C:\\Users\\username\\anaconda3\\envs\\rhino_mcp\\python.exe`
+- macOS: `/Users/username/anaconda3/envs/rhino_mcp/bin/python`
 
 Make sure to:
 
