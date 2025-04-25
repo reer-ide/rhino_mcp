@@ -33,7 +33,7 @@ The system consists of two main components:
 
 ### Setting up the Python Environment
 
-#### Option 1: Using Conda 
+#### Option 1: Using Conda
 
 1. Create a new conda environment with Python 3.10:
 
@@ -58,6 +58,7 @@ The system consists of two main components:
 If you already have Python installed, you can install the MCP server directly to your base environment:
 
 1. Install the package in development mode:
+
    ```bash
    pip install -e .
    ```
@@ -70,7 +71,7 @@ If you already have Python installed, you can install the MCP server directly to
 
 ### Installing the Rhino-side Script
 
-1. Open Rhino 
+1. Open Rhino
 2. For Rhino 7:
    - Open the Python Editor:
      - Click on the "Tools" menu
@@ -80,6 +81,7 @@ If you already have Python installed, you can install the MCP server directly to
      - Navigate to and select `rhino_script.py`
      - Click "Run" (or press F5)
 3. For Rhino 8:
+
    - Click on "Tools" menu
    - Select "RhinoScript" > "Run"
    - Navigate to and select `rhino_script.py`
@@ -129,7 +131,9 @@ To integrate with Claude Desktop:
   }
 }
 ```
-Example paths:
+
+Example Command paths:
+
 - Windows: `C:\\Users\\username\\anaconda3\\envs\\rhino_mcp\\python.exe`
 - macOS: `/Users/username/anaconda3/envs/rhino_mcp/bin/python`
 
@@ -139,7 +143,6 @@ Make sure to:
 - Save the file and restart Claude Desktop
 
 > **Important Note:** If you're using a conda environment, you must specify the full path to the Python interpreter as shown above. Using the `uvx` command might not work properly with conda environments.
-
 
 ## Usage
 
@@ -152,7 +155,6 @@ Once connected, Claude or another LLM can use the following MCP tools:
 - `execute_code(code)`: Execute arbitrary Python code in Rhino
 - `get_objects_with_metadata(filters, metadata_fields)`: Get detailed information about objects in the scene with their metadata, with optional filtering
 - `capture_viewport(layer, show_annotations, max_size)`: Capture the viewport with optional annotations and layer filtering
-
 
 ### Example Commands
 
