@@ -126,13 +126,13 @@ class RhinoTools:
     
     def _register_tools(self):
         """Register all Rhino tools with the MCP server."""
-        self.app.tool()(self.get_scene_info)
-        self.app.tool()(self.get_layers)
-        self.app.tool()(self.get_scene_objects_with_metadata)
-        self.app.tool()(self.capture_viewport)
+        self.app.tool()(self.get_rhino_scene_info)
+        self.app.tool()(self.get_rhino_layers)
+        self.app.tool()(self.get_rhino_scene_objects_with_metadata)
+        self.app.tool()(self.capture_rhino_viewport)
         self.app.tool()(self.execute_rhino_code)
     
-    def get_scene_info(self, ctx: Context) -> str:
+    def get_rhino_scene_info(self, ctx: Context) -> str:
         """Get basic information about the current Rhino scene.
         
         This is a lightweight function that returns basic scene information:
@@ -145,28 +145,28 @@ class RhinoTools:
         """
         try:
             connection = get_rhino_connection()
-            result = connection.send_command("get_scene_info")
+            result = connection.send_command("get_rhino_scene_info")
             return json.dumps(result, indent=2)
         except Exception as e:
             logger.error("Error getting scene info from Rhino: {0}".format(str(e)))
             return "Error getting scene info: {0}".format(str(e))
 
-    def get_layers(self, ctx: Context) -> str:
+    def get_rhino_layers(self, ctx: Context) -> str:
         """Get list of layers in Rhino"""
         try:
             connection = get_rhino_connection()
-            result = connection.send_command("get_layers")
+            result = connection.send_command("get_rhino_layers")
             return json.dumps(result, indent=2)
         except Exception as e:
             logger.error("Error getting layers from Rhino: {0}".format(str(e)))
             return "Error getting layers: {0}".format(str(e))
 
-    def get_scene_objects_with_metadata(self, ctx: Context, filters: Optional[Dict[str, Any]] = None, metadata_fields: Optional[List[str]] = None) -> str:
+    def get_rhino_scene_objects_with_metadata(self, ctx: Context, filters: Optional[Dict[str, Any]] = None, metadata_fields: Optional[List[str]] = None) -> str:
         """Get detailed information about objects in the scene with their metadata.
         
         This is a CORE FUNCTION for scene context awareness. It provides:
         1. Full metadata for each object we created via this mcp connection including:
-           - short_id (DDHHMMSS format), can be dispalyed in the viewport when using capture_viewport, can help visually identify the a object and find it with this function
+           - short_id (DDHHMMSS format), can be dispalyed in the viewport when using capture_rhino_viewport, can help visually identify the a object and find it with this function
            - created_at timestamp
            - layer  - layer path
            - type - geometry type 
@@ -201,7 +201,7 @@ class RhinoTools:
             logger.error("Error getting objects with metadata: {0}".format(str(e)))
             return "Error getting objects with metadata: {0}".format(str(e))
 
-    def capture_viewport(self, ctx: Context, layer: Optional[str] = None, show_annotations: bool = True, max_size: int = 800) -> Image:
+    def capture_rhino_viewport(self, ctx: Context, layer: Optional[str] = None, show_annotations: bool = True, max_size: int = 800) -> Image:
         """Capture the current viewport as an image.
         
         Args:
@@ -213,7 +213,7 @@ class RhinoTools:
         """
         try:
             connection = get_rhino_connection()
-            result = connection.send_command("capture_viewport", {
+            result = connection.send_command("capture_rhino_viewport", {
                 "layer": layer,
                 "show_annotations": show_annotations,
                 "max_size": max_size
@@ -250,12 +250,12 @@ class RhinoTools:
         IMPORTANT NOTES FOR CODE EXECUTION:
         0. DONT FORGET NO f-strings! No f-strings, No f-strings!
         1. This is Rhino 7 with IronPython 2.7 - no f-strings or modern Python features
-        3. When creating objects, ALWAYS call add_object_metadata(name, description) after creation
+        3. When creating objects, ALWAYS call add_rhino_object_metadata(name, description) after creation
         4. For user interaction, you can use RhinoCommon syntax (selected_objects = rs.GetObjects("Please select some objects") etc.) prompted the suer what to do 
            but prefer automated solutions unless user interaction is specifically requested
         5. Always show the user the code you are executing   
         
-        The add_object_metadata() function is provided in the code context and must be called
+        The add_rhino_object_metadata() function is provided in the code context and must be called
         after creating any object. It adds standardized metadata including:
         - name (provided by you)
         - description (provided by you)
@@ -273,7 +273,7 @@ class RhinoTools:
         # Create geometry
         cube_id = rs.AddBox(corners)
         # Add metadata - ALWAYS do this after creating an object
-        add_object_metadata(cube_id, "My Cube", "A test cube created via MCP")
+        add_rhino_object_metadata(cube_id, "My Cube", "A test cube created via MCP")
 
         >>>
 
@@ -287,7 +287,7 @@ import json
 import time
 from datetime import datetime
 
-def add_object_metadata(obj_id, name=None, description=None):
+def add_rhino_object_metadata(obj_id, name=None, description=None):
     # Add standardized metadata to an object
     try:
         # Generate short ID

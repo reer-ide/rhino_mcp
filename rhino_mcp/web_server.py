@@ -39,13 +39,13 @@ def rhino_creation_strategy() -> str:
     access the geometry specific properties (such as corner points etc.) to create more complex scenes with spatial consistency. Start from sparse to detail (e.g. first the building plot, then the wall, then the window etc. - it is crucial to use metadata to be able to do that)
 
     1. Scene Context Awareness:
-       - Always start by checking the scene using get_scene_info() for basic overview
-       - Use the capture_viewport to get an image from viewport to get a quick overview of the scene
+       - Always start by checking the scene using get_rhino_scene_info() for basic overview
+       - Use the capture_rhino_viewport to get an image from viewport to get a quick overview of the scene
        - Use get_objects_with_metadata() for detailed object information and filtering
-       - The short_id in metadata can be displayed in viewport using capture_viewport()
+       - The short_id in metadata can be displayed in viewport using capture_rhino_viewport()
 
     2. Object Creation and Management:
-       - When creating objects, ALWAYS call add_object_metadata() after creation (The add_object_metadata() function is provided in the code context)   
+       - When creating objects, ALWAYS call add_rhino_object_metadata() after creation (The add_rhino_object_metadata() function is provided in the code context)   
        - Use meaningful names for objects to help with you with later identification, organize the scenes with layers (but not too many layers)
        - Think about grouping objects (e.g. two planes that form a window)
     
@@ -94,7 +94,7 @@ async def execute_command(command: Dict[str, Any]):
 async def get_scene():
     """get scene info"""
     try:
-        scene_info = rhino_tools.get_scene_info()
+        scene_info = rhino_tools.get_rhino_scene_info()
         return {"status": "success", "data": scene_info}
     except Exception as e:
         return {"status": "error", "message": str(e)}

@@ -31,7 +31,7 @@ class ReplicateTools:
             # Get Rhino viewport image
             from .rhino_tools import get_rhino_connection
             connection = get_rhino_connection()
-            result = connection.send_command("capture_viewport", {
+            result = connection.send_command("capture_rhino_viewport", {
                 "layer": None, 
                 "show_annotations": False,
                 "max_size": 800

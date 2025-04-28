@@ -236,17 +236,17 @@ class RhinoMCPServer:
             command_type = command.get("type")
             params = command.get("params", {})
             
-            if command_type == "get_scene_info":
+            if command_type == "get_rhino_scene_info":
                 return self._get_scene_info(params)
             elif command_type == "create_cube":
                 return self._create_cube(params)
-            elif command_type == "get_layers":
+            elif command_type == "get_rhino_layers":
                 return self._get_layers()
             elif command_type == "execute_code":
                 return self._execute_code(params)
             elif command_type == "get_objects_with_metadata":
                 return self._get_objects_with_metadata(params)
-            elif command_type == "capture_viewport":
+            elif command_type == "capture_rhino_viewport":
                 return self._capture_viewport(params)
             elif command_type == "add_metadata":
                 return self._add_object_metadata(

@@ -144,11 +144,11 @@ Make sure to:
 
 Once connected, Claude or another LLM can use the following MCP tools:
 
-- `get_scene_info()`: Get simplified scene information focusing on layers and example objects
-- `get_layers()`: Get information about all layers in the Rhino scene
+- `get_rhino_scene_info()`: Get simplified scene information focusing on layers and example objects
+- `get_rhino_layers()`: Get information about all layers in the Rhino scene
 - `execute_code(code)`: Execute arbitrary Python code in Rhino
 - `get_objects_with_metadata(filters, metadata_fields)`: Get detailed information about objects in the scene with their metadata, with optional filtering
-- `capture_viewport(layer, show_annotations, max_size)`: Capture the viewport with optional annotations and layer filtering
+- `capture_rhino_viewport(layer, show_annotations, max_size)`: Capture the viewport with optional annotations and layer filtering
 
 
 ### Example Commands
