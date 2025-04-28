@@ -128,7 +128,7 @@ class RhinoTools:
         """Register all Rhino tools with the MCP server."""
         self.app.tool()(self.get_rhino_scene_info)
         self.app.tool()(self.get_rhino_layers)
-        self.app.tool()(self.get_rhino_scene_objects_with_metadata)
+        self.app.tool()(self.get_rhino_objects_with_metadata)
         self.app.tool()(self.capture_rhino_viewport)
         self.app.tool()(self.execute_rhino_code)
     
@@ -161,7 +161,7 @@ class RhinoTools:
             logger.error("Error getting layers from Rhino: {0}".format(str(e)))
             return "Error getting layers: {0}".format(str(e))
 
-    def get_rhino_scene_objects_with_metadata(self, ctx: Context, filters: Optional[Dict[str, Any]] = None, metadata_fields: Optional[List[str]] = None) -> str:
+    def get_rhino_objects_with_metadata(self, ctx: Context, filters: Optional[Dict[str, Any]] = None, metadata_fields: Optional[List[str]] = None) -> str:
         """Get detailed information about objects in the scene with their metadata.
         
         This is a CORE FUNCTION for scene context awareness. It provides:
@@ -192,7 +192,7 @@ class RhinoTools:
         """
         try:
             connection = get_rhino_connection()
-            result = connection.send_command("get_objects_with_metadata", {
+            result = connection.send_command("get_rhino_objects_with_metadata", {
                 "filters": filters or {},
                 "metadata_fields": metadata_fields
             })
@@ -206,7 +206,7 @@ class RhinoTools:
         
         Args:
             layer: Optional layer name to filter annotations
-            show_annotations: Whether to show object annotations, this will display the short_id of the object in the viewport you can use the short_id to select specific objects with the get_objects_with_metadata function
+            show_annotations: Whether to show object annotations, this will display the short_id of the object in the viewport you can use the short_id to select specific objects with the get_rhino_objects_with_metadata function
         
         Returns:
             An MCP Image object containing the viewport capture

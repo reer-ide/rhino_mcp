@@ -237,19 +237,19 @@ class RhinoMCPServer:
             params = command.get("params", {})
             
             if command_type == "get_rhino_scene_info":
-                return self._get_scene_info(params)
-            elif command_type == "create_cube":
+                return self._get_rhino_scene_info(params)
+            elif command_type == "_rhino_create_cube":
                 return self._create_cube(params)
             elif command_type == "get_rhino_layers":
-                return self._get_layers()
+                return self._get_rhino_layers()
             elif command_type == "execute_code":
-                return self._execute_code(params)
-            elif command_type == "get_objects_with_metadata":
-                return self._get_objects_with_metadata(params)
+                return self._execute_rhino_code(params)
+            elif command_type == "get_rhino_objects_with_metadata":
+                return self._get_rhino_objects_with_metadata(params)
             elif command_type == "capture_rhino_viewport":
-                return self._capture_viewport(params)
-            elif command_type == "add_metadata":
-                return self._add_object_metadata(
+                return self._capture_rhino_viewport(params)
+            elif command_type == "add_rhino_object_metadata":
+                return self._add_rhino_object_metadata(
                     params.get("object_id"), 
                     params.get("name"), 
                     params.get("description")
@@ -262,7 +262,7 @@ class RhinoMCPServer:
             traceback.print_exc()
             return {"status": "error", "message": str(e)}
     
-    def _get_scene_info(self, params=None):
+    def _get_rhino_scene_info(self, params=None):
         """Get simplified scene information focusing on layers and example objects"""
         try:
             doc = sc.doc
@@ -363,7 +363,7 @@ class RhinoMCPServer:
         except Exception as e:
             return {"status": "error", "message": str(e)}
     
-    def _get_layers(self):
+    def _get_rhino_layers(self):
         """Get information about all layers"""
         try:
             doc = sc.doc
@@ -385,7 +385,7 @@ class RhinoMCPServer:
         except Exception as e:
             return {"status": "error", "message": str(e)}
     
-    def _execute_code(self, params):
+    def _execute_rhino_code(self, params):
         """Execute arbitrary Python code"""
         try:
             code = params.get("code", "")
@@ -447,7 +447,7 @@ class RhinoMCPServer:
             log_message("System error: {0}".format(error_response))
             return error_response
 
-    def _add_object_metadata(self, obj_id, name=None, description=None):
+    def _add_rhino_object_metadata(self, obj_id, name=None, description=None):
         """Add standardized metadata to an object"""
         try:
             import json
@@ -500,7 +500,7 @@ class RhinoMCPServer:
             log_message("Error adding metadata: " + str(e))
             return {"status": "error", "message": str(e)}
 
-    def _get_objects_with_metadata(self, params):
+    def _get_rhino_objects_with_metadata(self, params):
         """Get objects with their metadata, with optional filtering"""
         try:
             import re
@@ -605,7 +605,7 @@ class RhinoMCPServer:
                 "available_fields": all_fields
             }
 
-    def _capture_viewport(self, params):
+    def _capture_rhino_viewport(self, params):
         """Capture viewport with optional annotations and layer filtering"""
         try:
             layer_name = params.get("layer")

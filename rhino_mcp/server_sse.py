@@ -78,13 +78,13 @@ def rhino_creation_strategy() -> str:
 
     Especially when working with geometry, iterate with smaller steps and check the scene state from time to time.
     Act strategically with a long-term plan, think about how to organize the data and scene objects in a way that is easy to maintain and extend, by using layers and metadata (name, description),
-    with the get_objects_with_metadata() function you can filter and select objects based on this metadata. You can access objects, and with the "type" attribute you can check their geometry type and
+    with the get_rhino_objects_with_metadata() function you can filter and select objects based on this metadata. You can access objects, and with the "type" attribute you can check their geometry type and
     access the geometry specific properties (such as corner points etc.) to create more complex scenes with spatial consistency. Start from sparse to detail (e.g. first the building plot, then the wall, then the window etc. - it is crucial to use metadata to be able to do that)
 
     1. Scene Context Awareness:
        - Always start by checking the scene using get_rhino_scene_info() for basic overview
        - Use the capture_rhino_viewport to get an image from viewport to get a quick overview of the scene
-       - Use get_objects_with_metadata() for detailed object information and filtering
+       - Use get_rhino_objects_with_metadata() for detailed object information and filtering
        - The short_id in metadata can be displayed in viewport using capture_rhino_viewport()
 
     2. Object Creation and Management:
