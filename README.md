@@ -2,6 +2,11 @@
 
 This project is developed by REER, INC. and made public for the community to use and test. We welcome contributors to help improve and expand the functionality of RhinoMCP. RhinoMCP connects Rhino, Grasshopper and more to Claude AI through the Model Context Protocol (MCP), allowing Claude to directly interact with and control Rhino. This integration enables prompt-assisted 3D modeling, scene creation, and manipulation. (inspired by [blender_mcp](https://github.com/ahujasid/blender-mcp))
 
+The project provides two server implementations:
+
+- Standard Stdio protocol MCP server for Claude Desktop integration
+- SSE (Server-Side Events) protocol server for custom web client integration
+
 ## Features
 
 #### Rhino
@@ -33,7 +38,7 @@ The system consists of two main components:
 
 ### Setting up the Python Environment
 
-#### Option 1: Using Conda 
+#### Option 1: Using Conda
 
 1. Create a new conda environment with Python 3.10:
 
@@ -58,6 +63,7 @@ The system consists of two main components:
 If you already have Python installed, you can install the MCP server directly to your base environment:
 
 1. Install the package in development mode:
+
    ```bash
    pip install -e .
    ```
@@ -70,7 +76,7 @@ If you already have Python installed, you can install the MCP server directly to
 
 ### Installing the Rhino-side Script
 
-1. Open Rhino 
+1. Open Rhino
 2. For Rhino 7:
    - Open the Python Editor:
      - Click on the "Tools" menu
@@ -80,6 +86,7 @@ If you already have Python installed, you can install the MCP server directly to
      - Navigate to and select `rhino_script.py`
      - Click "Run" (or press F5)
 3. For Rhino 8:
+
    - Click on "Tools" menu
    - Select "RhinoScript" > "Run"
    - Navigate to and select `rhino_script.py`
@@ -90,7 +97,7 @@ If you already have Python installed, you can install the MCP server directly to
    To stop the server, run: stop_server()
    ```
 
-### Running the MCP Server
+### Running the Stdio MCP Server
 
 The MCP server will be started automatically by Claude Desktop using the configuration in `claude_desktop_config.json`. You don't need to start it manually.
 
@@ -130,6 +137,11 @@ To integrate with Claude Desktop:
 }
 ```
 
+Example Command paths:
+
+- Windows: `C:\\Users\\username\\anaconda3\\envs\\rhino_mcp\\python.exe`
+- macOS: `/Users/username/anaconda3/envs/rhino_mcp/bin/python`
+
 Make sure to:
 
 - Replace the Python path with the path to Python in your conda environment or system Python
@@ -137,6 +149,17 @@ Make sure to:
 
 > **Important Note:** If you're using a conda environment, you must specify the full path to the Python interpreter as shown above. Using the `uvx` command might not work properly with conda environments.
 
+### SSE (Server-Side Events) Protocol Rhino MCP Server
+
+The SSE server is an alternative implementation of the Rhino MCP server that uses Server-Side Events for real-time communication. This server runs on `127.0.0.1:8080` and is designed to work with custom web clients. It provides the same functionality as the standard MCP server but uses a different transport protocol that's more suitable for web-based applications.
+
+To use the SSE server:
+
+1. Run the server using: `python -m rhino_mcp.server_sse`
+2. Connect your web client to `ws://127.0.0.1:8080/sse`
+3. Send messages to `http://127.0.0.1:8080/messages/`
+
+The SSE server supports all the same Rhino operations as the standard MCP server, making it ideal for building custom web interfaces for Rhino control.
 
 ## Usage
 

@@ -65,19 +65,6 @@ def rhino_creation_strategy() -> str:
        - Use viewport captures to verify visual results
     """
 
-# @mcp.prompt()
-# def grasshopper_usage_strategy() -> str:
-#     """Defines the preferred strategy for working with Grasshopper through MCP"""
-#     return """When working with Grasshopper through MCP, follow these guidelines:
-#     1. Connection Setup:
-#        - Always check if the Grasshopper server is available
-#     2. Definition Exploration:
-#        - Use get_definition_info() for overview
-#     3. Code Execution:
-#        - Use IronPython 2.7 compatible code
-#        - Can create grasshopper components via code
-#        - Can access rhino objects by reference
-#     """
 
 # HTTP endpoint
 @app.post("/rhino/command")
@@ -104,7 +91,6 @@ async def get_strategy():
     """get Rhino strategy"""
     return {
         "rhino_strategy": rhino_creation_strategy(),
-        "grasshopper_strategy": grasshopper_usage_strategy()
     }
 
 # WebSocket endpoint

@@ -6,9 +6,7 @@ from contextlib import asynccontextmanager
 from typing import AsyncIterator, Dict, Any, List, Optional
 from pathlib import Path
 from rhino_mcp.rhino_tools import RhinoTools, get_rhino_connection
-from rhino_mcp.grasshopper_tools import GrasshopperTools, get_grasshopper_connection
 from typing import Any
-import httpx
 from mcp.server.fastmcp import FastMCP
 from starlette.applications import Starlette
 from mcp.server.sse import SseServerTransport
@@ -51,17 +49,6 @@ async def server_lifespan(server: FastMCP) -> AsyncIterator[Dict[str, Any]]:
         except Exception as e:
             logger.warning("Could not connect to Rhino script: {0}".format(str(e)))
         
-        # # Try to connect to Grasshopper script
-        # try:
-        #     gh_conn = get_grasshopper_connection()
-        #     # Just check if the server is available - don't connect yet
-        #     if gh_conn.check_server_available():
-        #         logger.info("Grasshopper server is available")
-        #     else:
-        #         logger.warning("Grasshopper server is not available. Start the GHPython component in Grasshopper to enable Grasshopper integration.")
-        # except Exception as e:
-        #     logger.warning("Error checking Grasshopper server availability: {0}".format(str(e)))
-        
         yield {}
     finally:
         logger.info("RhinoMCP server shut down")
@@ -73,13 +60,6 @@ async def server_lifespan(server: FastMCP) -> AsyncIterator[Dict[str, Any]]:
                 logger.info("Disconnected from Rhino script")
             except Exception as e:
                 logger.warning("Error disconnecting from Rhino: {0}".format(str(e)))
-        
-        # if gh_conn:
-        #     try:
-        #         gh_conn.disconnect()
-        #         logger.info("Disconnected from Grasshopper script")
-        #     except Exception as e:
-        #         logger.warning("Error disconnecting from Grasshopper: {0}".format(str(e)))
 
 # Create the MCP server with lifespan support
 app = FastMCP(
@@ -90,7 +70,6 @@ app = FastMCP(
 
 # Initialize tool collections
 rhino_tools = RhinoTools(app)
-grasshopper_tools = GrasshopperTools(app)
 
 @app.prompt()
 def rhino_creation_strategy() -> str:
@@ -130,26 +109,6 @@ def rhino_creation_strategy() -> str:
        - Use viewport captures to verify visual results
     """
 
-@app.prompt()
-def grasshopper_usage_strategy() -> str:
-    """Defines the preferred strategy for working with Grasshopper through MCP"""
-    return """When working with Grasshopper through MCP, follow these guidelines:
-    Grasshooper is closely itnergrated with rhino, you can access rhino objects by referencing them, you can 
-    see grasshopper generted geometry in rhino viewport.
-
-    1. Connection Setup:
-       - Always check if the Grasshopper server is available by using is_server_available()
-
-    2. Definition Exploration:
-       - Use get_definition_info() to get an overview of components and parameters in the definition
-
-    4. Code Execution Guidelines:
-       - Always use IronPython 2.7 compatible code (no f-strings, no walrus operator, etc.)
-       - you can create grashopper componetns via code 
-       - you can access rhino objects by referencing them
-
-    """
-
 def create_starlette_app(mcp_server: Server, *, debug: bool = False) -> Starlette:
     """Create a Starlette application that can serve the provided mcp server with SSE."""
     sse = SseServerTransport("/messages/")
@@ -180,7 +139,7 @@ def main():
     mcp_server = app._mcp_server
 
     # Define default settings
-    HOST = "127.0.0.1"  # 或 "localhost"，只允许本机访问
+    HOST = "127.0.0.1"  
     PORT = 8080      
 
     # Create and run the Starlette app

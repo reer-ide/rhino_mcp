@@ -18,7 +18,6 @@ except ImportError:
 
 # Import our tool modules
 from rhino_mcp.rhino_tools import RhinoTools, get_rhino_connection
-from rhino_mcp.grasshopper_tools import GrasshopperTools, get_grasshopper_connection
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, 
@@ -41,18 +40,7 @@ async def server_lifespan(server: FastMCP) -> AsyncIterator[Dict[str, Any]]:
             logger.info("Successfully connected to Rhino script")
         except Exception as e:
             logger.warning("Could not connect to Rhino script: {0}".format(str(e)))
-        
-        # # Try to connect to Grasshopper script
-        # try:
-        #     gh_conn = get_grasshopper_connection()
-        #     # Just check if the server is available - don't connect yet
-        #     if gh_conn.check_server_available():
-        #         logger.info("Grasshopper server is available")
-        #     else:
-        #         logger.warning("Grasshopper server is not available. Start the GHPython component in Grasshopper to enable Grasshopper integration.")
-        # except Exception as e:
-        #     logger.warning("Error checking Grasshopper server availability: {0}".format(str(e)))
-        
+
         yield {}
     finally:
         logger.info("RhinoMCP server shut down")
@@ -64,13 +52,6 @@ async def server_lifespan(server: FastMCP) -> AsyncIterator[Dict[str, Any]]:
                 logger.info("Disconnected from Rhino script")
             except Exception as e:
                 logger.warning("Error disconnecting from Rhino: {0}".format(str(e)))
-        
-        # if gh_conn:
-        #     try:
-        #         gh_conn.disconnect()
-        #         logger.info("Disconnected from Grasshopper script")
-        #     except Exception as e:
-        #         logger.warning("Error disconnecting from Grasshopper: {0}".format(str(e)))
 
 # Create the MCP server with lifespan support
 app = FastMCP(
@@ -81,7 +62,6 @@ app = FastMCP(
 
 # Initialize tool collections
 rhino_tools = RhinoTools(app)
-grasshopper_tools = GrasshopperTools(app)
 
 @app.prompt()
 def rhino_creation_strategy() -> str:
