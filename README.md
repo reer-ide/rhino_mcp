@@ -16,6 +16,7 @@ The project provides two server implementations:
 - **Layer management**: View and interact with Rhino layers
 - **Scene inspection**: Get detailed information about the current Rhino scene (incl. screencapture)
 - **Code execution**: Run arbitrary Python code in Rhino from Claude
+- **Object selection**: Get information about the currently selected objects in Rhino
 
 #### Grasshopper (Under Development)
 
