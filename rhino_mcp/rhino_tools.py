@@ -131,6 +131,7 @@ class RhinoTools:
         self.app.tool()(self.get_rhino_objects_with_metadata)
         self.app.tool()(self.capture_rhino_viewport)
         self.app.tool()(self.execute_rhino_code)
+        self.app.tool()(self.get_rhino_selected_objects)
     
     def get_rhino_scene_info(self, ctx: Context) -> str:
         """Get basic information about the current Rhino scene.
@@ -360,3 +361,27 @@ def add_rhino_object_metadata(obj_id, name=None, description=None):
             error_msg = "Error executing code: {0}".format(str(e))
             logger.error(error_msg)
             return error_msg
+
+    def get_rhino_selected_objects(self, ctx: Context, include_lights: bool = False, include_grips: bool = False) -> str:
+        """Get the identifiers of all objects that are currently selected in Rhino.
+        
+        This tool provides access to objects that have been manually selected in the Rhino viewport.
+        It returns a list of object identifiers (GUIDs) that can be used with other Rhino functions.
+        
+        Args:
+            include_lights: Whether to include light objects in the selection
+            include_grips: Whether to include grip objects in the selection
+        
+        Returns:
+            JSON string containing the selected object identifiers and metadata
+        """
+        try:
+            connection = get_rhino_connection()
+            result = connection.send_command("get_rhino_selected_objects", {
+                "include_lights": include_lights,
+                "include_grips": include_grips
+            })
+            return json.dumps(result, indent=2)
+        except Exception as e:
+            logger.error("Error getting selected objects from Rhino: {0}".format(str(e)))
+            return "Error getting selected objects: {0}".format(str(e))

@@ -254,6 +254,8 @@ class RhinoMCPServer:
                     params.get("name"), 
                     params.get("description")
                 )
+            elif command_type == "get_rhino_selected_objects":
+                return self._get_rhino_selected_objects(params)
             else:
                 return {"status": "error", "message": "Unknown command type"}
                 
@@ -692,6 +694,58 @@ class RhinoMCPServer:
                 "type": "text",
                 "text": "Error capturing viewport: " + str(e)
             }
+
+    def _get_rhino_selected_objects(self, params):
+        """Get objects that are currently selected in Rhino"""
+        try:            
+            include_lights = params.get("include_lights", False)
+            include_grips = params.get("include_grips", False)
+            
+            # Get selected objects using rhinoscriptsyntax
+            selected_ids = rs.SelectedObjects(include_lights, include_grips)
+            
+            if not selected_ids:
+                return {
+                    "status": "success",
+                    "message": "No objects selected",
+                    "count": 0,
+                    "objects": []
+                }
+                
+            # Collect object data
+            selected_objects = []
+            for obj_id in selected_ids:
+                # Get basic object information
+                obj = sc.doc.Objects.Find(obj_id)
+                if not obj:
+                    continue
+                    
+                obj_data = {
+                    "id": str(obj_id),
+                    "name": obj.Name or "Unnamed",
+                    "type": obj.Geometry.GetType().Name if obj.Geometry else "Unknown",
+                    "layer": rs.ObjectLayer(obj_id)
+                }
+                
+                # Get metadata from user strings
+                user_strings = {}
+                for key in rs.GetUserText(obj_id):
+                    user_strings[key] = rs.GetUserText(obj_id, key)
+                
+                if user_strings:
+                    obj_data["metadata"] = user_strings
+                    
+                selected_objects.append(obj_data)
+                
+            return {
+                "status": "success",
+                "count": len(selected_objects),
+                "objects": selected_objects
+            }
+            
+        except Exception as e:
+            log_message("Error getting selected objects: " + str(e))
+            return {"status": "error", "message": str(e)}
 
 # Create and start server
 server = RhinoMCPServer(HOST, PORT)
