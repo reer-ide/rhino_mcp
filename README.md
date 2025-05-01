@@ -1,5 +1,7 @@
 # RhinoMCP - Rhino Model Context Protocol Integration
 
+[![PyPI version](https://badge.fury.io/py/rhino-mcp.svg)](https://badge.fury.io/py/rhino-mcp)
+
 This project is developed by REER, INC. and made public for the community to use and test. We welcome contributors to help improve and expand the functionality of RhinoMCP. RhinoMCP connects Rhino, Grasshopper and more to Claude AI through the Model Context Protocol (MCP), allowing Claude to directly interact with and control Rhino. This integration enables prompt-assisted 3D modeling, scene creation, and manipulation. (inspired by [blender_mcp](https://github.com/ahujasid/blender-mcp))
 
 The project provides two server implementations:
@@ -36,11 +38,119 @@ The system consists of two main components:
 
 - Rhino 7 or newer
 - Python 3.10 or newer
+- uv package manager
 - Conda (for environment management) or an existing Python installation
 
-### Setting up the Python Environment
+### Installation Options
 
-#### Option 1: Using Conda
+**If you're on Mac, please install uv as**
+```bash
+brew install uv
+```
+**On Windows**
+```bash
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex" 
+```
+and then
+```bash
+set Path=C:\Users\nntra\.local\bin;%Path%
+```
+Otherwise installation instructions are on their website: [Install uv](https://docs.astral.sh/uv/getting-started/installation/)
+
+**⚠️ Do not proceed before installing UV**
+
+
+#### Option 1: Quick Installation with uvx/pip (Recommended)
+
+#####First, you need to integrate with Claude Desktop:
+
+1. Go to Claude Desktop > Settings > Developer > Edit Config
+2. Open the `claude_desktop_config.json` file and add the following configuration:
+
+```json
+{
+  "mcpServers": {
+    "rhino": {
+      "command": "uvx",
+      "args": ["rhino-mcp"]
+    }
+  }
+}
+```
+3. Save the file
+
+#####Or if you want to use Cursor:
+For Mac users, go to Settings > MCP and paste the following 
+
+- To use as a global server, use "add new global MCP server" button and paste
+- To use as a project specific server, create `.cursor/mcp.json` in the root of the project and paste
+
+
+```json
+{
+    "mcpServers": {
+        "rhino": {
+            "command": "uvx",
+            "args": [
+                "rhino-mcp"
+            ]
+        }
+    }
+}
+```
+
+For Windows users, go to Settings > MCP > Add Server, add a new server with the following settings:
+
+```json
+{
+    "mcpServers": {
+        "rhino": {
+            "command": "cmd",
+            "args": [
+                "/c",
+                "uvx",
+                "rhino-mcp"
+            ]
+        }
+    }
+}
+```
+
+#####Then install the Rhino-side Script:
+
+1. Download the `rhino_script.py` file from the repository
+2. Open Rhino
+3. For Rhino 7:
+   - Open the Python Editor:
+     - Click on the "Tools" menu
+     - Select "Python Editor" (or press Ctrl+Alt+P / Cmd+Alt+P)
+   - In the Python Editor:
+     - Click "File" > "Open"
+     - Navigate to and select `rhino_script.py`
+     - Click "Run" (or press F5)
+
+4. For Rhino 8:
+   - Click on "Tools" menu
+   - Select "RhinoScript" > "Run"
+   - Navigate to and select `rhino_script.py`
+
+5. The script will start automatically and you should see these messages in the Python Editor:
+   ```
+   RhinoMCP script loaded. Server started automatically.
+   To stop the server, run: stop_server()
+   ```
+
+#####Lastly, restart the Claude Desktop, it will automatically start the MCP server and connect to Rhino
+
+This method is recommended for most users who just want to use RhinoMCP without modifying its source code.
+
+#### Option 2: Local Development Installation
+
+If you want to modify the source code or contribute to the project, you can install it in development mode:
+
+##### Clone the repository
+
+##### Using Conda
 
 1. Create a new conda environment with Python 3.10:
 
@@ -60,7 +170,7 @@ The system consists of two main components:
    uv pip install -e .
    ```
 
-#### Option 2: Using Existing Python Installation
+##### Using Existing Python Installation
 
 If you already have Python installed, you can install the MCP server directly to your base environment:
 
@@ -76,57 +186,9 @@ If you already have Python installed, you can install the MCP server directly to
    where python    # On Windows
    ```
 
-### Installing the Rhino-side Script
+##### Claude Desktop Integration
 
-1. Open Rhino
-2. For Rhino 7:
-   - Open the Python Editor:
-     - Click on the "Tools" menu
-     - Select "Python Editor" (or press Ctrl+Alt+P / Cmd+Alt+P)
-   - In the Python Editor:
-     - Click "File" > "Open"
-     - Navigate to and select `rhino_script.py`
-     - Click "Run" (or press F5)
-3. For Rhino 8:
-
-   - Click on "Tools" menu
-   - Select "RhinoScript" > "Run"
-   - Navigate to and select `rhino_script.py`
-
-4. The script will start automatically and you should see these messages in the Python Editor:
-   ```
-   RhinoMCP script loaded. Server started automatically.
-   To stop the server, run: stop_server()
-   ```
-
-### Running the Stdio MCP Server
-
-The MCP server will be started automatically by Claude Desktop using the configuration in `claude_desktop_config.json`. You don't need to start it manually.
-
-### Starting the Connection
-
-1. First, start the Rhino script:
-
-   - Open Rhino 7 or 8
-   - Load and run `rhino_script.py` as described above
-   - Verify you see the startup messages in the Python Editor or command line
-
-2. Then start Claude Desktop:
-   - It will automatically start the MCP server when needed
-   - The connection between Claude and Rhino will be established automatically
-
-### Managing the Connection
-
-- To stop the Rhino script server:
-  - In the Python Editor, type `stop_server()` and press Enter
-  - You should see "RhinoMCP server stopped" in the output
-
-### Claude Integration
-
-To integrate with Claude Desktop:
-
-1. Go to Claude Desktop > Settings > Developer > Edit Config
-2. Open the `claude_desktop_config.json` file and add the following configuration:
+Same as Option 1, but you need to specify the full path to the Python interpreter in the `claude_desktop_config.json` file:
 
 ```json
 {
@@ -139,17 +201,18 @@ To integrate with Claude Desktop:
 }
 ```
 
-Example Command paths:
+Example Python paths:
 
 - Windows: `C:\\Users\\username\\anaconda3\\envs\\rhino_mcp\\python.exe`
 - macOS: `/Users/username/anaconda3/envs/rhino_mcp/bin/python`
 
 Make sure to:
 
-- Replace the Python path with the path to Python in your conda environment or system Python
+- Replace the Python path with the path to Python in your conda environment or system Python if using the second method
 - Save the file and restart Claude Desktop
 
-> **Important Note:** If you're using a conda environment, you must specify the full path to the Python interpreter as shown above. Using the `uvx` command might not work properly with conda environments.
+> **Important Note:** If you're using a conda environment, you must specify the full path to the Python interpreter as shown above.
+
 
 ### SSE (Server-Side Events) Protocol Rhino MCP Server
 
