@@ -18,6 +18,8 @@ dependencies = [
 ]
 
 [project.scripts]
+rhino-mcp = "rhino_mcp.server:main"
+rhino-web = "rhino_mcp.web_server:main"
 reer-rhino-web = "rhino_mcp.web_server:main"
 reer-rhino-mcp = "rhino_mcp.server:main"
 
