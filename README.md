@@ -62,7 +62,7 @@ Otherwise installation instructions are on their website: [Install uv](https://d
 
 #### Option 1: Quick Installation with uvx/pip (Recommended)
 
-#####First, you need to integrate with Claude Desktop:
+First, you need to integrate with Claude Desktop:
 
 1. Go to Claude Desktop > Settings > Developer > Edit Config
 2. Open the `claude_desktop_config.json` file and add the following configuration:
@@ -79,7 +79,7 @@ Otherwise installation instructions are on their website: [Install uv](https://d
 ```
 3. Save the file
 
-#####Or if you want to use Cursor:
+Or if you want to use Cursor:
 For Mac users, go to Settings > MCP and paste the following 
 
 - To use as a global server, use "add new global MCP server" button and paste
@@ -116,7 +116,7 @@ For Windows users, go to Settings > MCP > Add Server, add a new server with the 
 }
 ```
 
-#####Then install the Rhino-side Script:
+Then install the Rhino-side Script:
 
 1. Download the `rhino_script.py` file from the repository
 2. Open Rhino
@@ -140,7 +140,7 @@ For Windows users, go to Settings > MCP > Add Server, add a new server with the 
    To stop the server, run: stop_server()
    ```
 
-#####Lastly, restart the Claude Desktop, it will automatically start the MCP server and connect to Rhino
+Lastly, restart the Claude Desktop, it will automatically start the MCP server and connect to Rhino
 
 This method is recommended for most users who just want to use RhinoMCP without modifying its source code.
 
@@ -148,7 +148,7 @@ This method is recommended for most users who just want to use RhinoMCP without 
 
 If you want to modify the source code or contribute to the project, you can install it in development mode:
 
-##### Clone the repository
+Clone the repository
 
 ##### Using Conda
 
