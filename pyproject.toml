@@ -1,6 +1,6 @@
 [project]
 name = "reer-rhino-mcp"
-version = "0.1.1"
+version = "0.1.2"
 description = "Rhino MCP Server"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -18,8 +18,8 @@ dependencies = [
 ]
 
 [project.scripts]
-rhino-mcp = "rhino_mcp.server:main"
-rhino-web = "rhino_mcp.web_server:main"
+reer-rhino-web = "rhino_mcp.web_server:main"
+reer-rhino-mcp = "rhino_mcp.server:main"
 
 [build-system]
 requires = ["setuptools>=61.0", "wheel"]
