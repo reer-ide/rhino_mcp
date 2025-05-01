@@ -94,11 +94,10 @@ def rhino_creation_strategy() -> str:
        - scriptcontext is already imported as sc
        - json is already imported as json
        - time is already imported as time
-       - datetime is already imported as datetime
-       - Please use the Irhono python 2.7 library to access rhino functions
+       - datetime is already imported as datetim
        - DONT FORGET NO f-strings! No f-strings, No f-strings!
        - Prefer automated solutions over user interaction, unless its requested or it makes sense or you struggle with errors
-       - You can use rhino command syntax to ask the user questions e.g. "should i do "A" or "B"" where A,B are clickable options
+       - You can always use the look_up_RhinoScriptSyntax() function to look up the documentation for a RhinoScriptSyntax function directly from the Rhino3D developer website.
 
     5. Best Practices:
        - Always show the user the code you are executing, for example show the input to the execute_rhino_code() function in { `code`: `...`}   

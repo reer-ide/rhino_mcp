@@ -17,6 +17,7 @@ The project provides two server implementations:
 - **Scene inspection**: Get detailed information about the current Rhino scene (incl. screencapture)
 - **Code execution**: Run arbitrary Python code in Rhino from Claude
 - **Object selection**: Get information about the currently selected objects in Rhino
+- **RhinoScriptSyntax documentation**: Look up the documentation for a RhinoScriptSyntax 
 
 #### Grasshopper (Under Development)
 
@@ -174,6 +175,7 @@ Once connected, Claude or another LLM can use the following MCP tools:
 - `get_rhino_objects_with_metadata(filters, metadata_fields)`: Get detailed information about objects in the scene with their metadata, with optional filtering
 - `capture_rhino_viewport(layer, show_annotations, max_size)`: Capture the viewport with optional annotations and layer filtering
 - `get_rhino_selected_objects(include_lights, include_grips)`: Get information about objects currently selected in the Rhino viewport
+- `look_up_RhinoScriptSyntax(function_name)`: Look up documentation for a RhinoScriptSyntax function directly from the Rhino3D developer website
 
 
 ### Example Commands
@@ -186,6 +188,8 @@ Here are some examples of what you can ask Claude to do:
 - "Execute this Python code in Rhino: ..."
 - "Can you tell me the dimension of the wall I selected in Rhino?"
 - "Help me calculate the surface area of the selected floor in Rhino"
+- "Show me the documentation for the SelectedObjects function"
+- "How do I use the AddCylinder function in Rhino Script?"
 - ...
 
 ## Contributing
