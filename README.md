@@ -1,6 +1,6 @@
 # RhinoMCP - Rhino Model Context Protocol Integration
 
-[![PyPI version](https://badge.fury.io/py/rhino-mcp.svg)](https://badge.fury.io/py/rhino-mcp)
+[![PyPI version](https://badge.fury.io/py/reer-rhino-mcp.svg)](https://badge.fury.io/py/reer-rhino-mcp)
 
 This project is developed by REER, INC. and made public for the community to use and test. We welcome contributors to help improve and expand the functionality of RhinoMCP. RhinoMCP connects Rhino, Grasshopper and more to Claude AI through the Model Context Protocol (MCP), allowing Claude to directly interact with and control Rhino. This integration enables prompt-assisted 3D modeling, scene creation, and manipulation. (inspired by [blender_mcp](https://github.com/ahujasid/blender-mcp))
 
@@ -72,7 +72,7 @@ First, you need to integrate with Claude Desktop:
   "mcpServers": {
     "rhino": {
       "command": "uvx",
-      "args": ["rhino-mcp"]
+      "args": ["reer-rhino-mcp"]
     }
   }
 }
@@ -92,7 +92,7 @@ For Mac users, go to Settings > MCP and paste the following
         "rhino": {
             "command": "uvx",
             "args": [
-                "rhino-mcp"
+                "reer-rhino-mcp"
             ]
         }
     }
@@ -109,7 +109,7 @@ For Windows users, go to Settings > MCP > Add Server, add a new server with the 
             "args": [
                 "/c",
                 "uvx",
-                "rhino-mcp"
+                "reer-rhino-mcp"
             ]
         }
     }

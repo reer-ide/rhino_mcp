@@ -1,5 +1,5 @@
 [project]
-name = "rhino-mcp"
+name = "reer-rhino-mcp"
 version = "0.1.0"
 description = "Rhino MCP Server"
 readme = "README.md"
