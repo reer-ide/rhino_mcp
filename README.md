@@ -43,17 +43,13 @@ The system consists of two main components:
 
 ### Installation Options
 
-**If you're on Mac, please install uv as**
+**If you're on Mac, please install uv as follows:**
 ```bash
 brew install uv
 ```
-**On Windows**
+**On Windows open Powershell and run**
 ```bash
-powershell -c "irm https://astral.sh/uv/install.ps1 | iex" 
-```
-and then
-```bash
-set Path=C:\Users\nntra\.local\bin;%Path%
+irm https://astral.sh/uv/install.ps1 | iex
 ```
 Otherwise installation instructions are on their website: [Install uv](https://docs.astral.sh/uv/getting-started/installation/)
 
