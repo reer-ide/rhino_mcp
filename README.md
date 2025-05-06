@@ -42,10 +42,10 @@ The system consists of two main components:
 - Conda (for environment management) or an existing Python installation
 
 ### Installation Options
-
-**If you're on Mac, please install uv as follows:**
+## Install uv
+**If you're on Mac, open terminal and run:**
 ```bash
-brew install uv
+wget -qO- https://astral.sh/uv/install.sh | sh
 ```
 **On Windows open Powershell and run**
 ```bash
