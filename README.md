@@ -140,6 +140,10 @@ Lastly, restart the Claude Desktop, it will automatically start the MCP server a
 
 This method is recommended for most users who just want to use RhinoMCP without modifying its source code.
 
+You can also watch the video tutorial for this method:
+
+[![Watch the video](https://img.youtube.com/vi/1elly3GneIY/0.jpg)](https://youtu.be/1elly3GneIY)
+
 #### Option 2: Local Development Installation
 
 If you want to modify the source code or contribute to the project, you can install it in development mode:
