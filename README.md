@@ -51,6 +51,13 @@ wget -qO- https://astral.sh/uv/install.sh | sh
 ```bash
 irm https://astral.sh/uv/install.ps1 | iex
 ```
+and then
+```bash
+set Path=C:\Users\<your_username>\.local\bin;%Path% # cmd
+```
+```bash
+$env:Path = "C:\Users\<your_username>\.local\bin;";$env:Path # powershell
+```
 Otherwise installation instructions are on their website: [Install uv](https://docs.astral.sh/uv/getting-started/installation/)
 
 **⚠️ Do not proceed before installing UV**
@@ -110,6 +117,10 @@ For Windows users, go to Settings > MCP > Add Server, add a new server with the 
         }
     }
 }
+```
+Note: If the single "uvx" command is not working, you can try specifying the full path to the uvx executable, it should be in your .local/bin folder if installed default:
+```json
+"command": "/Users/<your_username>/.local/bin/uvx"
 ```
 
 Then install the Rhino-side Script:
