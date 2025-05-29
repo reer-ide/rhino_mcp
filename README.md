@@ -45,7 +45,7 @@ The system consists of two main components:
 ## Install uv
 **If you're on Mac, open terminal and run:**
 ```bash
-wget -qO- https://astral.sh/uv/install.sh | sh
+brew install uv
 ```
 **On Windows open Powershell and run**
 ```bash
