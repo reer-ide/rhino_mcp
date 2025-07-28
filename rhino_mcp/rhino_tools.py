@@ -13,7 +13,7 @@ from PIL import Image as PILImage
 import requests
 import re
 from rhino_mcp.resources.rhino_script_categories import get_function_category
-
+import textwrap
 
 # Configure logging
 logger = logging.getLogger("RhinoTools")
@@ -141,6 +141,7 @@ class RhinoTools:
         """Get basic information about the current Rhino scene.
         
         This is a lightweight function that returns basic scene information:
+        - the Unit of Measure of current file
         - List of all layers with basic information about the layer and 5 sample objects with their metadata 
         - No metadata or detailed properties
         - Use this for quick scene overview or when you only need basic object information
@@ -281,8 +282,6 @@ class RhinoTools:
         add_rhino_object_metadata(cube_id, "My Cube", "A test cube created via MCP")
 
         >>>
-
-        DONT FORGET NO f-strings! No f-strings, No f-strings!
         """
         try:
             code_template = """
@@ -337,11 +336,11 @@ def add_rhino_object_metadata(obj_id, name=None, description=None):
         return {"status": "success"}
     except Exception as e:
         return {"status": "error", "message": str(e)}
-
-            """ + code
+            """ 
+            combined_code = code_template + "\n# --- User Code Start ---\n" + textwrap.dedent(code).lstrip() + "\n"
             logger.info("Sending code execution request to Rhino")
             connection = get_rhino_connection()
-            result = connection.send_command("execute_code", {"code": code_template})
+            result = connection.send_command("execute_code", {"code": combined_code})
             
             logger.info("Received response from Rhino: {0}".format(result))
             
