@@ -37,3 +37,6 @@ Thumbs.db
 
 # Environment files
 .env
+
+#Claude
+CLAUDE.md
