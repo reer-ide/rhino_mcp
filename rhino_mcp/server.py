@@ -18,7 +18,7 @@ except ImportError:
 
 # Import our tool modules
 from rhino_mcp.rhino_tools import RhinoTools, get_rhino_connection
-from rhino_mcp.grasshopper_tools import GrasshopperTools
+# from rhino_mcp.grasshopper_tools import GrasshopperTools
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, 
@@ -62,7 +62,7 @@ mcp = FastMCP(
 
 # Initialize tool collections
 rhino_tools = RhinoTools(mcp)
-grasshopper_tools = GrasshopperTools(mcp)
+# grasshopper_tools = GrasshopperTools(mcp)
 
 @mcp.prompt()
 def rhino_creation_strategy() -> str:
