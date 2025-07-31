@@ -23,7 +23,7 @@ class RhinoConnection:
         self.host = host
         self.port = port
         self.socket = None
-        self.timeout = 30.0  # 30 second timeout
+        self.timeout = 120.0  # 2 minute timeout for complex operations
         self.buffer_size = 14485760  # 10MB buffer size for handling large images
     
     def connect(self):
