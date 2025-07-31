@@ -1,6 +1,6 @@
 [project]
 name = "reer-rhino-mcp"
-version = "0.1.9" 
+version = "0.1.10" 
 description = "Rhino MCP Server"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -21,6 +21,8 @@ dependencies = [
     "requests>=2.28.0",
     "python-dotenv>=0.21.0",
     "starlette>=0.27.0",
+    "httpx>=0.24.0",
+    "anyio>=3.0.0,<4.0.0",
 ]
 
 [project.scripts]

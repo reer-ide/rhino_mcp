@@ -130,7 +130,8 @@ def grasshopper_usage_strategy() -> str:
 
 def main():
     """Run the MCP server"""
-    mcp.run(transport='stdio')
+    # FastMCP defaults to stdio transport
+    mcp.run()
 
 if __name__ == "__main__":
     main()

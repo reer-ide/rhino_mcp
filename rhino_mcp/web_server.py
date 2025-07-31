@@ -48,18 +48,15 @@ def rhino_creation_strategy() -> str:
        - When creating objects, ALWAYS call add_rhino_object_metadata() after creation (The add_rhino_object_metadata() function is provided in the code context)   
        - Use meaningful names for objects to help with you with later identification, organize the scenes with layers (but not too many layers)
        - Think about grouping objects (e.g. two planes that form a window)
-    
-    3. Always check the bbox for each item so that (it's stored as list of points in the metadata under the key "bbox"):
-            - Ensure that all objects that should not be clipping are not clipping.
-            - Items have the right spatial relationship.
 
-    4. Code Execution:
+    3. Code Execution:
        - This is Rhino 7 with IronPython 2.7 - no f-strings or modern Python features etc
        - DONT FORGET NO f-strings! No f-strings, No f-strings!
        - Prefer automated solutions over user interaction, unless its requested or it makes sense or you struggle with errors
        - You can use rhino command syntax to ask the user questions e.g. "should i do "A" or "B"" where A,B are clickable options
+       - If you got an error related to the RhinoScriptSyntax, always use the look_up_RhinoScriptSyntax tool to look up the correct syntax
 
-    5. Best Practices:
+    4. Best Practices:
        - Keep objects organized in appropriate layers
        - Use meaningful names and descriptions
        - Use viewport captures to verify visual results
