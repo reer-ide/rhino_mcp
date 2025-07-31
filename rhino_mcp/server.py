@@ -18,6 +18,7 @@ except ImportError:
 
 # Import our tool modules
 from rhino_mcp.rhino_tools import RhinoTools, get_rhino_connection
+from rhino_mcp.grasshopper_tools import GrasshopperTools
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, 
@@ -28,7 +29,6 @@ logger = logging.getLogger("RhinoMCPServer")
 async def server_lifespan(server: FastMCP) -> AsyncIterator[Dict[str, Any]]:
     """Manage server startup and shutdown lifecycle"""
     rhino_conn = None
-    gh_conn = None
     
     try:
         logger.info("RhinoMCP server starting up")
@@ -37,9 +37,9 @@ async def server_lifespan(server: FastMCP) -> AsyncIterator[Dict[str, Any]]:
         try:
             rhino_conn = get_rhino_connection()
             rhino_conn.connect()
-            logger.info("Successfully connected to Rhino script")
+            logger.info("Successfully connected to Rhino")
         except Exception as e:
-            logger.warning("Could not connect to Rhino script: {0}".format(str(e)))
+            logger.warning("Could not connect to Rhino: {0}".format(str(e)))
 
         yield {}
     finally:
@@ -49,21 +49,22 @@ async def server_lifespan(server: FastMCP) -> AsyncIterator[Dict[str, Any]]:
         if rhino_conn:
             try:
                 rhino_conn.disconnect()
-                logger.info("Disconnected from Rhino script")
+                logger.info("Disconnected from Rhino")
             except Exception as e:
                 logger.warning("Error disconnecting from Rhino: {0}".format(str(e)))
 
 # Create the MCP server with lifespan support
-app = FastMCP(
+mcp = FastMCP(
     "RhinoMCP",
-    description="Rhino integration through the Model Context Protocol",
+    instructions="Rhino integration through the Model Context Protocol",
     lifespan=server_lifespan
 )
 
 # Initialize tool collections
-rhino_tools = RhinoTools(app)
+rhino_tools = RhinoTools(mcp)
+grasshopper_tools = GrasshopperTools(mcp)
 
-@app.prompt()
+@mcp.prompt()
 def rhino_creation_strategy() -> str:
     """Defines the preferred strategy for creating and managing objects in Rhino"""
     return """When working with Rhino through MCP, follow these guidelines:
@@ -107,7 +108,7 @@ def rhino_creation_strategy() -> str:
        - When encouonter errors related to RhinoScriptSyntax, make sure to search the web for the correct syntax from the RhinoScriptSyntax API documentation
     """
 
-@app.prompt()
+@mcp.prompt()
 def grasshopper_usage_strategy() -> str:
     """Defines the preferred strategy for working with Grasshopper through MCP"""
     return """When working with Grasshopper through MCP, follow these guidelines:
@@ -129,7 +130,7 @@ def grasshopper_usage_strategy() -> str:
 
 def main():
     """Run the MCP server"""
-    app.run(transport='stdio')
+    mcp.run(transport='stdio')
 
 if __name__ == "__main__":
     main()
