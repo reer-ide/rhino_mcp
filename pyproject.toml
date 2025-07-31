@@ -1,6 +1,6 @@
 [project]
 name = "reer-rhino-mcp"
-version = "0.1.8.minor"   # minor version is used for minor changes to the server
+version = "0.1.8.dev1"   # minor version is used for minor changes to the server
 description = "Rhino MCP Server"
 readme = "README.md"
 requires-python = ">=3.10"
