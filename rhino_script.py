@@ -1,3 +1,4 @@
+#! python3
 """
 Rhino MCP - Rhino-side Script
 Handles communication with external MCP server and executes Rhino commands.
@@ -21,6 +22,24 @@ from System.Drawing.Imaging import ImageFormat
 from System.IO import MemoryStream
 from datetime import datetime
 
+# Grasshopper imports (will be available when Grasshopper is loaded)
+try:
+    from Grasshopper import Instances
+    from Grasshopper.Kernel import GH_ComponentServer
+    from System import Guid
+    from System.Drawing import PointF
+    # Import common Grasshopper component libraries
+    import Grasshopper.Kernel.Parameters as Params
+    import Grasshopper.Kernel.Special as Special
+except ImportError:
+    # Grasshopper not available, will be handled in functions
+    Instances = None
+    GH_ComponentServer = None
+    Guid = None
+    PointF = None
+    Params = None
+    Special = None
+
 # Configuration
 HOST = 'localhost'
 PORT = 9876
@@ -38,6 +57,9 @@ VALID_METADATA_FIELDS = {
         'user_text'      # All user text key-value pairs
     ]
 }
+
+# Note: Component creation now uses dynamic lookup through Grasshopper's component server
+# instead of hardcoded mappings. This is more robust and handles component name variations.
 
 def get_log_dir():
     """Get the appropriate log directory based on the platform"""
@@ -91,7 +113,7 @@ class RhinoMCPServer:
     
     def start(self):
         if self.running:
-            log_message("Server is already running")
+            log_message("Server is already running on {0}:{1}".format(self.host, self.port))
             return
             
         self.running = True
@@ -256,6 +278,16 @@ class RhinoMCPServer:
                 )
             elif command_type == "get_rhino_selected_objects":
                 return self._get_rhino_selected_objects(params)
+            elif command_type == "grasshopper_add_components":
+                return self._grasshopper_add_components(params)
+            elif command_type == "grasshopper_get_definition_info":
+                return self._grasshopper_get_definition_info()
+            elif command_type == "grasshopper_run_solver":
+                return self._grasshopper_run_solver(params)
+            elif command_type == "grasshopper_clear_canvas":
+                return self._grasshopper_clear_canvas()
+            elif command_type == "grasshopper_list_available_components":
+                return self._grasshopper_list_available_components()
             else:
                 return {"status": "error", "message": "Unknown command type"}
                 
@@ -276,6 +308,39 @@ class RhinoMCPServer:
             
             log_message("Getting simplified scene info...")
             layers_info = []
+
+            # Get unit system information
+            unit_system_code = rs.UnitSystem()
+            unit_system_names = {
+                0: "No unit system",
+                1: "Microns",
+                2: "Millimeters", 
+                3: "Centimeters",
+                4: "Meters",
+                5: "Kilometers",
+                6: "Microinches",
+                7: "Mils",
+                8: "Inches",
+                9: "Feet",
+                10: "Miles",
+                11: "Custom Unit System",
+                12: "Angstroms",
+                13: "Nanometers",
+                14: "Decimeters",
+                15: "Dekameters",
+                16: "Hectometers",
+                17: "Megameters",
+                18: "Gigameters",
+                19: "Yards",
+                20: "Printer point",
+                21: "Printer pica",
+                22: "Nautical mile",
+                23: "Astronomical",
+                24: "Lightyears",
+                25: "Parsecs"
+            }
+            
+            unit_system_name = unit_system_names.get(unit_system_code, "Unknown")
             
             for layer in doc.Layers:
                 layer_objects = [obj for obj in doc.Objects if obj.Attributes.LayerIndex == layer.Index]
@@ -311,10 +376,14 @@ class RhinoMCPServer:
             
             response = {
                 "status": "success",
+                "unit_system": {
+                    "code": unit_system_code,
+                    "name": unit_system_name
+                },
                 "layers": layers_info
             }
             
-            log_message("Simplified scene info collected successfully")
+            log_message("Simplified scene info collected successfully: {0}".format(json.dumps(response)))
             return response
             
         except Exception as e:
@@ -396,9 +465,6 @@ class RhinoMCPServer:
             
             log_message("Executing code: {0}".format(code))
             
-            # Create a new scope for code execution
-            local_dict = {}
-            
             # Create a list to store printed output
             printed_output = []
             
@@ -409,12 +475,17 @@ class RhinoMCPServer:
                 # Also print to Rhino's command line
                 Rhino.RhinoApp.WriteLine(output)
             
-            # Add custom print to local scope
-            local_dict['print'] = custom_print
+            # Create execution environment with custom print in both global and local scope
+            exec_globals = globals().copy()
+            exec_globals['print'] = custom_print
+            exec_globals['printed_output'] = printed_output
+            
+            local_dict = {'print': custom_print, 'printed_output': printed_output}
             
             try:
-                # Execute the code
-                exec(code, globals(), local_dict)
+                # Execute the code with custom print in both scopes
+                # To Do: Find a way to add the script running to the history
+                exec(code, exec_globals, local_dict)
                 
                 # Get result from local_dict or use a default message
                 result = local_dict.get("result", "Code executed successfully")
@@ -696,55 +767,399 @@ class RhinoMCPServer:
             }
 
     def _get_rhino_selected_objects(self, params):
-        """Get objects that are currently selected in Rhino"""
+        """Get objects that are currently selected in Rhino, including subobjects"""
         try:            
             include_lights = params.get("include_lights", False)
             include_grips = params.get("include_grips", False)
-            
-            # Get selected objects using rhinoscriptsyntax
-            selected_ids = rs.SelectedObjects(include_lights, include_grips)
-            
-            if not selected_ids:
-                return {
-                    "status": "success",
-                    "message": "No objects selected",
-                    "count": 0,
-                    "objects": []
-                }
-                
-            # Collect object data
+            include_subobjects = params.get("include_subobjects", True)
+
             selected_objects = []
-            for obj_id in selected_ids:
-                # Get basic object information
-                obj = sc.doc.Objects.Find(obj_id)
-                if not obj:
-                    continue
-                    
-                obj_data = {
-                    "id": str(obj_id),
-                    "name": obj.Name or "Unnamed",
-                    "type": obj.Geometry.GetType().Name if obj.Geometry else "Unknown",
-                    "layer": rs.ObjectLayer(obj_id)
-                }
+            
+            # Handle subobject selections if enabled
+            if include_subobjects:
+                object_count = sc.doc.Objects.Count
+
+                log_message("Checking {0} objects for both sub-objects and full-objects selection...".format(object_count))
+
+                # Create GetObject for interactive selection
+                go = Rhino.Input.Custom.GetObject()
+                go.SetCommandPrompt("Select objects or subobjects (Enter when done)")
+                go.SubObjectSelect = True  # Enable subobject selection
+                go.DeselectAllBeforePostSelect = False
+                go.EnableBottomObjectPreference = True  # Prefer edges over surfaces
                 
-                # Get metadata from user strings
-                user_strings = {}
-                for key in rs.GetUserText(obj_id):
-                    user_strings[key] = rs.GetUserText(obj_id, key)
+                # Allow multiple selection
+                result = go.GetMultiple(0, 0)  # min=0, max=0 means any number
                 
-                if user_strings:
-                    obj_data["metadata"] = user_strings
-                    
-                selected_objects.append(obj_data)
+                if result == Rhino.Input.GetResult.Object:
+                    object_count = go.ObjectCount
+                    if not object_count:
+                        log_message("No objects selected")
+                        return {
+                            "status": "error",
+                            "message": "No objects selected"
+                        }
+                    for i in range(object_count):
+                        objref = go.Object(i)
+                        obj = objref.Object()
+                        
+                        # Check if this is a subobject selection
+                        component_index = objref.GeometryComponentIndex
+                        
+                        if component_index.ComponentIndexType != Rhino.Geometry.ComponentIndexType.InvalidType:
+                            # This is a subobject selection
+                            obj_id = obj.Id
+                            
+                            # Check if we already have this object in our list
+                            existing_obj = None
+                            for existing in selected_objects:
+                                if existing["id"] == str(obj_id) and existing["selection_type"] == "subobject":
+                                    existing_obj = existing
+                                    break
+                            
+                            if existing_obj:
+                                # Add to existing subobject list
+                                existing_obj["subobjects"].append({
+                                    "index": component_index.Index,
+                                    "type": str(component_index.ComponentIndexType)
+                                })
+                            else:
+                                # Create new entry
+                                obj_data = {
+                                    "id": str(obj_id),
+                                    "name": obj.Name or "Unnamed",
+                                    "type": obj.Geometry.GetType().Name if obj.Geometry else "Unknown",
+                                    "layer": rs.ObjectLayer(obj_id),
+                                    "selection_type": "subobject",
+                                    "subobjects": [{
+                                        "index": component_index.Index,
+                                        "type": str(component_index.ComponentIndexType)
+                                    }]
+                                }
+                                
+                                # Get metadata
+                                user_strings = {}
+                                for key in rs.GetUserText(obj_id):
+                                    user_strings[key] = rs.GetUserText(obj_id, key)
+                                
+                                if user_strings:
+                                    obj_data["metadata"] = user_strings
+                                    
+                                selected_objects.append(obj_data)
+                        else:
+                            # This is a full object selection
+                            obj_data = {
+                                "id": str(obj.Id),
+                                "name": obj.Name or "Unnamed",
+                                "type": obj.Geometry.GetType().Name if obj.Geometry else "Unknown",
+                                "layer": rs.ObjectLayer(obj.Id),
+                                "selection_type": "full"
+                            }
+                            
+                            # Get metadata
+                            user_strings = {}
+                            for key in rs.GetUserText(obj.Id):
+                                user_strings[key] = rs.GetUserText(obj.Id, key)
+                            
+                            if user_strings:
+                                obj_data["metadata"] = user_strings
+                                
+                            selected_objects.append(obj_data)
                 
+                go.Dispose()
+            
             return {
                 "status": "success",
                 "count": len(selected_objects),
-                "objects": selected_objects
+                "objects": selected_objects,
             }
             
         except Exception as e:
             log_message("Error getting selected objects: " + str(e))
+            return {"status": "error", "message": str(e)}
+
+    def _grasshopper_add_components(self, params):
+        """Add components to the current Grasshopper definition"""
+        try:
+            components = params.get("components", [])
+            if not components:
+                return {"status": "error", "message": "No components specified"}
+            
+            # Get Grasshopper plugin
+            gh = rs.GetPlugInObject('Grasshopper')
+            if not gh:
+                return {"status": "error", "message": "Grasshopper plugin not available"}
+            
+            if not gh.IsEditorLoaded():
+                return {"status": "error", "message": "Grasshopper editor is not loaded"}
+            
+            if not Instances:
+                return {"status": "error", "message": "Grasshopper Instances not available"}
+            
+            doc = Instances.ActiveCanvas.Document
+            if not doc:
+                return {"status": "error", "message": "No active Grasshopper document"}
+            
+            created_components = []
+            component_objects = []
+            
+            # Create components using direct instantiation
+            for i, comp_def in enumerate(components):
+                comp_type = comp_def.get("type")
+                position = comp_def.get("position", [100 + i * 100, 100])
+                name = comp_def.get("name")
+                
+                try:
+                    component = None
+                    
+                    # Create components based on type - using direct instantiation
+                    if comp_type == "Number Slider" and Special:
+                        component = Special.GH_NumberSlider()
+                    elif comp_type == "Number" and Params:
+                        component = Params.Param_Number()
+                    elif comp_type == "Integer" and Params:
+                        component = Params.Param_Integer()
+                    elif comp_type == "Boolean" and Params:
+                        component = Params.Param_Boolean()
+                    elif comp_type == "Point" and Params:
+                        component = Params.Param_Point()
+                    elif comp_type == "Vector" and Params:
+                        component = Params.Param_Vector()
+                    elif comp_type == "Text" and Params:
+                        component = Params.Param_String()
+                    else:
+                        # Try to create using Grasshopper plugin's component creation
+                        gh = rs.GetPlugInObject('Grasshopper')
+                        if gh and hasattr(gh, 'CreateComponent'):
+                            try:
+                                component = gh.CreateComponent(comp_type)
+                            except:
+                                pass
+                    
+                    if not component:
+                        log_message("Unknown component type: {0}".format(comp_type))
+                        continue
+                    
+                    # Set position
+                    component.CreateAttributes()
+                    if component.Attributes:
+                        component.Attributes.Pivot = PointF(float(position[0]), float(position[1]))
+                    
+                    # Set custom name if provided
+                    if name:
+                        component.NickName = name
+                    
+                    # Add to document
+                    doc.AddObject(component, False)
+                    
+                    created_components.append({
+                        "index": i,
+                        "type": comp_type,
+                        "position": position,
+                        "name": name or comp_type,
+                        "id": str(component.InstanceGuid)
+                    })
+                    
+                    component_objects.append(component)
+                    
+                except Exception as e:
+                    log_message("Error creating component {0}: {1}".format(comp_type, str(e)))
+                    continue
+            
+            # Handle connections
+            for i, comp_def in enumerate(components):
+                connections = comp_def.get("connections", [])
+                if not connections or i >= len(component_objects):
+                    continue
+                    
+                target_component = component_objects[i]
+                
+                for conn in connections:
+                    try:
+                        from_idx = conn.get("from_component", 0)
+                        from_output = conn.get("from_output", 0)
+                        to_input = conn.get("to_input", 0)
+                        
+                        if from_idx < len(component_objects):
+                            source_component = component_objects[from_idx]
+                            
+                            # Connect components
+                            if (hasattr(target_component, 'Params') and hasattr(source_component, 'Params') and
+                                to_input < len(target_component.Params.Input) and 
+                                from_output < len(source_component.Params.Output)):
+                                target_component.Params.Input[to_input].AddSource(
+                                    source_component.Params.Output[from_output]
+                                )
+                    except Exception as e:
+                        log_message("Error connecting components: {0}".format(str(e)))
+                        continue
+            
+            # Refresh canvas and run solver
+            try:
+                Instances.ActiveCanvas.Refresh()
+                gh.RunSolver(True)
+            except Exception as e:
+                log_message("Error refreshing canvas or running solver: {0}".format(str(e)))
+            
+            return {
+                "status": "success",
+                "message": "Added {0} components to Grasshopper".format(len(created_components)),
+                "components": created_components
+            }
+            
+        except Exception as e:
+            log_message("Error adding Grasshopper components: " + str(e))
+            return {"status": "error", "message": str(e)}
+
+    def _grasshopper_get_definition_info(self):
+        """Get information about the current Grasshopper definition"""
+        try:
+            # Get Grasshopper plugin
+            gh = rs.GetPlugInObject('Grasshopper')
+            if not gh:
+                return {"status": "error", "message": "Grasshopper plugin not available"}
+            
+            info = {
+                "editor_loaded": gh.IsEditorLoaded(),
+                "components": [],
+                "component_count": 0
+            }
+            
+            if gh.IsEditorLoaded() and Instances:
+                
+                doc = Instances.ActiveCanvas.Document
+                if doc:
+                    components_info = []
+                    
+                    for obj in doc.Objects:
+                        if hasattr(obj, 'ComponentGuid'):
+                            comp_info = {
+                                "id": str(obj.InstanceGuid),
+                                "type": obj.Name,
+                                "nickname": obj.NickName,
+                                "position": [obj.Attributes.Pivot.X, obj.Attributes.Pivot.Y] if obj.Attributes else [0, 0],
+                                "input_count": len(obj.Params.Input) if hasattr(obj, 'Params') else 0,
+                                "output_count": len(obj.Params.Output) if hasattr(obj, 'Params') else 0
+                            }
+                            components_info.append(comp_info)
+                    
+                    info["components"] = components_info
+                    info["component_count"] = len(components_info)
+            
+            return {
+                "status": "success",
+                "info": info
+            }
+            
+        except Exception as e:
+            log_message("Error getting Grasshopper definition info: " + str(e))
+            return {"status": "error", "message": str(e)}
+
+    def _grasshopper_run_solver(self, params):
+        """Run the Grasshopper solver"""
+        try:
+            force_update = params.get("force_update", True)
+            
+            # Get Grasshopper plugin
+            gh = rs.GetPlugInObject('Grasshopper')
+            if not gh:
+                return {"status": "error", "message": "Grasshopper plugin not available"}
+            
+            if not gh.IsEditorLoaded():
+                return {"status": "error", "message": "Grasshopper editor is not loaded"}
+            
+            # Run solver
+            gh.RunSolver(force_update)
+            
+            return {
+                "status": "success",
+                "message": "Grasshopper solver executed successfully"
+            }
+            
+        except Exception as e:
+            log_message("Error running Grasshopper solver: " + str(e))
+            return {"status": "error", "message": str(e)}
+
+    def _grasshopper_clear_canvas(self):
+        """Clear all components from the Grasshopper canvas"""
+        try:
+            # Get Grasshopper plugin
+            gh = rs.GetPlugInObject('Grasshopper')
+            if not gh:
+                return {"status": "error", "message": "Grasshopper plugin not available"}
+            
+            if not gh.IsEditorLoaded():
+                return {"status": "error", "message": "Grasshopper editor is not loaded"}
+            
+            if not Instances:
+                return {"status": "error", "message": "Grasshopper Instances not available"}
+            
+            doc = Instances.ActiveCanvas.Document
+            if doc:
+                # Clear all objects
+                doc.Objects.Clear()
+                
+                # Refresh canvas
+                Instances.ActiveCanvas.Refresh()
+                
+                return {
+                    "status": "success",
+                    "message": "Grasshopper canvas cleared successfully"
+                }
+            else:
+                return {"status": "error", "message": "No active Grasshopper document"}
+            
+        except Exception as e:
+            log_message("Error clearing Grasshopper canvas: " + str(e))
+            return {"status": "error", "message": str(e)}
+    
+    def _grasshopper_list_available_components(self):
+        """List all available Grasshopper components for debugging"""
+        try:
+            # Get Grasshopper plugin
+            gh = rs.GetPlugInObject('Grasshopper')
+            if not gh:
+                return {"status": "error", "message": "Grasshopper plugin not available"}
+            
+            if not gh.IsEditorLoaded():
+                return {"status": "error", "message": "Grasshopper editor is not loaded"}
+            
+            # Return list of supported component types
+            supported_components = [
+                {"name": "Number Slider", "category": "Params", "subcategory": "Input"},
+                {"name": "Number", "category": "Params", "subcategory": "Input"},
+                {"name": "Integer", "category": "Params", "subcategory": "Input"},
+                {"name": "Boolean", "category": "Params", "subcategory": "Input"},
+                {"name": "Point", "category": "Params", "subcategory": "Input"},
+                {"name": "Vector", "category": "Params", "subcategory": "Input"},
+                {"name": "Text", "category": "Params", "subcategory": "Input"},
+                {"name": "Series", "category": "Sets", "subcategory": "Sequence"},
+                {"name": "Range", "category": "Sets", "subcategory": "Sequence"},
+                {"name": "Cross Reference", "category": "Sets", "subcategory": "Tree"},
+                {"name": "Addition", "category": "Maths", "subcategory": "Operators"},
+                {"name": "Subtraction", "category": "Maths", "subcategory": "Operators"},
+                {"name": "Multiplication", "category": "Maths", "subcategory": "Operators"},
+                {"name": "Division", "category": "Maths", "subcategory": "Operators"},
+                {"name": "Line", "category": "Curve", "subcategory": "Primitive"},
+                {"name": "Circle", "category": "Curve", "subcategory": "Primitive"},
+                {"name": "Rectangle", "category": "Curve", "subcategory": "Primitive"},
+                {"name": "Polygon", "category": "Curve", "subcategory": "Primitive"},
+                {"name": "Extrude", "category": "Surface", "subcategory": "Freeform"},
+                {"name": "Move", "category": "Transform", "subcategory": "Euclidean"},
+                {"name": "Rotate", "category": "Transform", "subcategory": "Euclidean"},
+                {"name": "Scale", "category": "Transform", "subcategory": "Euclidean"},
+                {"name": "Construct Point", "category": "Vector", "subcategory": "Point"},
+            ]
+            
+            return {
+                "status": "success",
+                "components": supported_components,
+                "count": len(supported_components),
+                "note": "This is a list of currently supported component types. More components may be available but not yet implemented."
+            }
+            
+        except Exception as e:
+            log_message("Error listing Grasshopper components: " + str(e))
             return {"status": "error", "message": str(e)}
 
 # Create and start server
