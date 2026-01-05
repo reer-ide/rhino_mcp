@@ -138,7 +138,7 @@ Then install the Rhino-side Script:
 
 4. For Rhino 8:
    - Click on "Tools" menu
-   - Select "RhinoScript" > "Run"
+   - Select "Script" > "Run"
    - Navigate to and select `rhino_script.py`
 
 5. The script will start automatically and you should see these messages in the Python Editor:
